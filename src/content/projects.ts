@@ -1,6 +1,9 @@
 export type Project = { slug: string; title: string; eyebrow: string; summary: string; stack: string[]; href?: string };
 export const projects: Project[] = [
   { slug: 'amacos', title: 'AMACOS', eyebrow: 'Enterprise product engineering', summary: 'A complex business platform shaped through pragmatic architecture, reusable UI systems and reliable delivery workflows.', stack: ['Angular', 'Java', 'REST', 'Kubernetes', 'PostgreSQL'] },
+  { slug: 'schueco-product-configurator', title: 'Schüco Product Configurator', eyebrow: 'Digital product configuration', summary: 'Contributed to a product configuration experience that makes complex Schüco systems easier to explore and configure.', stack: ['Product configuration', 'Enterprise software', 'UX'] },
+  { slug: 'wincredit', title: 'WinCredit', eyebrow: 'Digital lending at Finnofleet', summary: 'Contributed to WinCredit, a digital finance product designed to support efficient and transparent credit workflows.', stack: ['Fintech', 'Credit workflows', 'Enterprise software'] },
+  { slug: 'sigil', title: 'Sigil', eyebrow: 'Open-source product development', summary: 'Contributed to an open-source application built around a focused, maintainable product experience.', stack: ['Open source', 'Product engineering', 'Application development'], href: 'https://github.com/ramiz4/sigil-app' },
   { slug: 'cine-lens', title: 'CineLens', eyebrow: 'On-device visual intelligence', summary: 'A privacy-first concept for identifying films from short video sequences using locally controlled computer vision.', stack: ['Vision AI', 'Python', 'Video processing', 'On-device'] },
   { slug: 'ngx-multi-level-push-menu', title: 'Multi-level Push Menu', eyebrow: 'Open-source UI architecture', summary: 'A reusable Angular navigation system designed for deeply nested information structures.', stack: ['Angular', 'TypeScript', 'Open source'], href: 'https://github.com/ramiz4/ngx-multi-level-push-menu' }
 ];
