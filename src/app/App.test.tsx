@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { App } from './App';
 
@@ -18,5 +18,13 @@ describe('App', () => {
     ]) expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument();
     expect(document.querySelectorAll('[data-story]')).toHaveLength(6);
     expect(screen.getByRole('main')).toHaveAttribute('tabindex', '-1');
+  });
+
+  it('opens the cinematic journey menu from the mobile command bar', () => {
+    render(<MemoryRouter><App /></MemoryRouter>);
+    fireEvent.click(screen.getByRole('button', { name: 'Open journey menu' }));
+    expect(screen.getByRole('dialog', { name: 'Your journey' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '1. Origin' })).toHaveAttribute('href', '#hero');
+    expect(screen.getByRole('button', { name: 'Close journey menu' })).toHaveAttribute('aria-expanded', 'true');
   });
 });

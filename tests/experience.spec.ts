@@ -27,3 +27,12 @@ test('uses the static story artwork when reduced motion is requested', async ({ 
   await expect(page.getByRole('heading', { name: /systems that move businesses/i })).toBeVisible();
   await expect(page.locator('[data-story]')).toHaveCount(6);
 });
+
+test('keeps every story chapter visible in a full-page mobile capture', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile full-page capture regression');
+  await page.goto('./');
+  await expect(page.getByRole('heading', { name: /systems that move businesses/i })).toBeVisible();
+  for (const heading of await page.locator('main h2').all()) await expect(heading).toBeVisible();
+  const capture = await page.screenshot({ fullPage: true });
+  expect(capture.byteLength).toBeGreaterThan(20_000);
+});
