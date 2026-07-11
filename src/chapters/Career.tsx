@@ -1,0 +1,2 @@
+import { Chapter } from '../components/Chapter'; import { career } from '../content/career';
+export function Career() { return <Chapter id="career" index="02" eyebrow="Career journey" title="From building websites to shaping product systems."><ol className="timeline">{career.map(item=><li key={item.company}><div><time>{item.period}</time><h3>{item.role}</h3><p>{item.company}</p></div><ul>{item.focus.map(f=><li key={f}>{f}</li>)}</ul></li>)}</ol></Chapter>; }

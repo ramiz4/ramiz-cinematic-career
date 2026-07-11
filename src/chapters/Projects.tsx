@@ -1,0 +1,2 @@
+import { Chapter } from '../components/Chapter'; import { projects } from '../content/projects';
+export function Projects() { return <Chapter id="projects" index="03" eyebrow="Selected systems" title="Products, not portfolio tiles."><div className="project-rail">{projects.map((p,i)=><article key={p.slug}><span>0{i+1}</span><p>{p.eyebrow}</p><h3>{p.title}</h3><p>{p.summary}</p><ul>{p.stack.map(s=><li key={s}>{s}</li>)}</ul>{p.href&&<a href={p.href} target="_blank" rel="noreferrer">View repository ↗</a>}</article>)}</div></Chapter>; }

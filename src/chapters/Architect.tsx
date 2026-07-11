@@ -1,0 +1,2 @@
+import { Chapter } from '../components/Chapter';
+export function Architect() { return <Chapter id="architect" index="04" eyebrow="The architect" title="Clarity is a feature."><blockquote>“The best architecture makes the next correct decision easier.”</blockquote><div className="principles"><span>Maintainability over novelty</span><span>Reuse over duplication</span><span>Evidence over assumptions</span><span>Delivery over ceremony</span></div></Chapter>; }

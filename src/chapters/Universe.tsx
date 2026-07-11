@@ -1,0 +1,3 @@
+import { Chapter } from '../components/Chapter';
+const nodes = ['Angular','TypeScript','Java','Spring Boot','.NET','REST','OpenAPI','Docker','Kubernetes','PostgreSQL','GitHub Actions','AI Agents'];
+export function Universe() { return <Chapter id="universe" index="01" eyebrow="Engineering universe" title="Architecture is a living network."><p className="lead">Frontend, domain logic, APIs, infrastructure and delivery are not separate disciplines. They are connected decisions.</p><div className="constellation">{nodes.map((n,i)=><span key={n} style={{'--i':i} as React.CSSProperties}>{n}</span>)}</div></Chapter>; }
