@@ -1,2 +1,0 @@
-# ramiz-cinematic-career
-test
