@@ -1,0 +1,2 @@
+import { expect, test } from '@playwright/test';
+test('renders the full career experience without horizontal overflow', async ({page}) => { const errors:string[]=[]; page.on('console',m=>{if(m.type()==='error')errors.push(m.text())}); await page.goto('./'); await expect(page.getByRole('heading',{name:/systems that move/i})).toBeVisible(); await expect(page.locator('section.chapter')).toHaveCount(5); const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth); expect(overflow).toBeFalsy(); expect(errors).toEqual([]); });

@@ -1,0 +1,3 @@
+import { render, screen } from '@testing-library/react'; import { MemoryRouter } from 'react-router-dom'; import { App } from './App';
+vi.mock('../experience/Scene', () => ({ Scene: () => <div data-testid="scene"/> }));
+describe('App', () => { it('renders all narrative chapters', () => { render(<MemoryRouter><App/></MemoryRouter>); expect(screen.getByRole('heading',{name:/engineer systems.*move businesses/i})).toBeInTheDocument(); for (const heading of ['Architecture is a living network.','From building websites to shaping product systems.','Products, not portfolio tiles.','Clarity is a feature.','Let’s build the next system.']) expect(screen.getByRole('heading',{name:heading})).toBeInTheDocument(); }); });
