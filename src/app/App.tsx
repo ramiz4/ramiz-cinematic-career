@@ -1,5 +1,6 @@
 import { Navigation } from '../components/Navigation';
 import { StoryProgress } from '../components/StoryProgress';
+import { InstallPrompt } from '../components/InstallPrompt';
 import { ExperienceLayer } from '../experience/ExperienceLayer';
 import { Hero } from '../chapters/Hero';
 import { Universe } from '../chapters/Universe';
@@ -13,6 +14,7 @@ export function App() {
     <a className="skip" href="#main">Skip to content</a>
     <Navigation />
     <StoryProgress />
+    <InstallPrompt />
     <ExperienceLayer />
     <main id="main" tabIndex={-1}>
       <Hero />

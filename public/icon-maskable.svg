@@ -2,7 +2,7 @@
   <defs>
     <radialGradient id="bg" cx="32%" cy="20%" r="92%">
       <stop offset="0" stop-color="#123522" />
-      <stop offset=".48" stop-color="#071a10" />
+      <stop offset=".5" stop-color="#071a10" />
       <stop offset="1" stop-color="#020705" />
     </radialGradient>
     <linearGradient id="signal" x1="0" y1="0" x2="1" y2="1">
@@ -16,14 +16,11 @@
   </defs>
   <rect width="512" height="512" fill="url(#bg)" />
   <rect width="512" height="512" fill="url(#grid)" />
-  <circle cx="256" cy="256" r="193" fill="none" stroke="#36ff9d" stroke-opacity=".12" />
-  <circle cx="256" cy="256" r="157" fill="#36ff9d" fill-opacity=".025" stroke="#8fffc5" stroke-opacity=".2" />
-  <path d="M142 340V172h78c40 0 60 20 60 53s-20 53-60 53h-78m78 0 68 62M322 172v168h86" fill="none" stroke="url(#signal)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="256" cy="256" r="177" fill="#36ff9d" fill-opacity=".025" stroke="#8fffc5" stroke-opacity=".18" />
+  <path d="M154 326V186h65c34 0 51 17 51 44s-17 44-51 44h-65m65 0 57 52M306 186v140h72" fill="none" stroke="url(#signal)" stroke-width="25" stroke-linecap="round" stroke-linejoin="round" />
   <g fill="#36ff9d">
-    <circle cx="63" cy="256" r="5" />
-    <circle cx="449" cy="256" r="5" />
-    <circle cx="256" cy="63" r="5" />
+    <circle cx="80" cy="256" r="5" />
+    <circle cx="432" cy="256" r="5" />
+    <circle cx="256" cy="80" r="5" />
   </g>
-  <path d="M96 416h132" stroke="#36ff9d" stroke-opacity=".32" stroke-width="3" />
-  <path d="M237 416h42" stroke="#c8ffe2" stroke-opacity=".75" stroke-width="3" />
 </svg>

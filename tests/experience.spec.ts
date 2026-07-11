@@ -1,4 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { IOS_INSTALL_DISMISS_KEY } from '../src/pwa/install';
+
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript((key) => window.localStorage.setItem(key, 'dismissed'), IOS_INSTALL_DISMISS_KEY);
+});
 
 test('tells the full scroll story without overflow or runtime errors', async ({ page }) => {
   const errors: string[] = [];

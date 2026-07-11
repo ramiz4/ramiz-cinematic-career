@@ -51,6 +51,11 @@ a:focus-visible {
   outline-offset: 4px;
 }
 
+button:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
 .skip {
   position: fixed;
   left: 1rem;
@@ -215,6 +220,135 @@ main:focus { outline: 0; }
 .story-progress li.is-active a { color: #e6fff1; }
 .story-progress li.is-active a i { transform: scale(1.55); border-color: var(--green); background: var(--green); box-shadow: 0 0 .8rem var(--green); }
 .story-progress__mobile-label { display: none; }
+
+/* iOS install guidance */
+.install-prompt {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 28;
+  width: min(calc(100% - 2rem), 31rem);
+  margin-inline: auto;
+  padding: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(143, 255, 197, .24);
+  border-radius: 1.4rem;
+  color: #effff6;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .075), transparent 34%),
+    rgba(3, 14, 8, .94);
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, .55), inset 0 1px rgba(255, 255, 255, .08);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
+}
+.install-prompt::before {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 0;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(210, 255, 231, .85), transparent);
+}
+.install-prompt__glow {
+  position: absolute;
+  right: -5rem;
+  top: -6rem;
+  width: 12rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(54, 255, 157, .16);
+  filter: blur(2.8rem);
+  pointer-events: none;
+}
+.install-prompt header {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.8rem minmax(0, 1fr) 2.6rem;
+  align-items: center;
+  gap: .8rem;
+}
+.install-prompt__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  border: 1px solid rgba(117, 255, 187, .32);
+  border-radius: .9rem;
+  color: var(--green);
+  background: radial-gradient(circle at 38% 28%, rgba(117, 255, 187, .2), rgba(4, 16, 10, .92) 65%);
+  box-shadow: inset 0 0 1.3rem rgba(54, 255, 157, .08), 0 0 1.6rem rgba(54, 255, 157, .08);
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: -.04em;
+}
+.install-prompt__mark i {
+  position: absolute;
+  inset: -.2rem;
+  border: 1px solid rgba(54, 255, 157, .3);
+  border-color: rgba(54, 255, 157, .38) transparent;
+  border-radius: 42%;
+  animation: install-orbit 5s linear infinite;
+}
+@keyframes install-orbit { to { transform: rotate(360deg); } }
+.install-prompt__eyebrow {
+  display: block;
+  margin-bottom: .18rem;
+  color: var(--green);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .52rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.install-prompt h2 { margin: 0; font-size: 1.15rem; line-height: 1.05; letter-spacing: -.035em; }
+.install-prompt > p { position: relative; margin: .9rem 0; color: #a9c1b2; font-size: .76rem; line-height: 1.45; }
+.install-prompt__close {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  padding: 0;
+  border: 1px solid rgba(117, 255, 187, .15);
+  border-radius: .85rem;
+  color: #9ab4a5;
+  background: rgba(54, 255, 157, .04);
+  font: inherit;
+  font-size: 1.2rem;
+}
+.install-prompt ol {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0 0 .75rem;
+  padding: 1px;
+  overflow: hidden;
+  border-radius: .85rem;
+  background: rgba(117, 255, 187, .12);
+  list-style: none;
+}
+.install-prompt li { display: grid; align-content: start; gap: .3rem; min-height: 4.3rem; padding: .65rem .55rem; background: rgba(3, 10, 6, .9); }
+.install-prompt li span { color: var(--green); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .52rem; }
+.install-prompt li strong { color: #d9eee1; font-size: .62rem; font-weight: 650; line-height: 1.25; }
+.install-prompt__dismiss {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 2.8rem;
+  padding: .7rem .9rem;
+  border: 0;
+  border-radius: 999px;
+  color: #031109;
+  background: var(--green);
+  font: inherit;
+  font-size: .72rem;
+  font-weight: 850;
+}
 
 /* Hero: the system core */
 .hero {
@@ -781,6 +915,13 @@ footer {
     border: 0;
   }
   .story-progress__mobile-label { display: block; min-width: 3.8rem; color: #d8eee1; text-align: right; }
+
+  .install-prompt {
+    bottom: calc(4.25rem + env(safe-area-inset-bottom));
+    width: calc(100% - 1rem);
+    max-height: calc(var(--app-viewport-height) - 6rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
 
   .hero { min-height: var(--app-viewport-height); }
   .hero__sticky {
