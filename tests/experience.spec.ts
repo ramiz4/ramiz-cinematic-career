@@ -36,3 +36,22 @@ test('keeps every story chapter visible in a full-page mobile capture', async ({
   const capture = await page.screenshot({ fullPage: true });
   expect(capture.byteLength).toBeGreaterThan(20_000);
 });
+
+test('keeps mobile sections bounded when Safari expands the capture viewport', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile Safari viewport regression');
+  await page.goto('./');
+  const frozenHeight = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-viewport-height')));
+  expect(frozenHeight).toBeGreaterThan(500);
+  expect(frozenHeight).toBeLessThan(1_500);
+
+  await page.setViewportSize({ width: 390, height: 9_000 });
+
+  const measurements = await page.locator('[data-story]').evaluateAll((sections) => sections.map((section) => ({
+    id: section.id,
+    minHeight: parseFloat(getComputedStyle(section).minHeight),
+  })));
+  for (const measurement of measurements) {
+    expect(measurement.minHeight, `${measurement.id} expanded with the capture viewport`).toBeLessThan(1_500);
+  }
+  expect(await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-viewport-height')))).toBe(frozenHeight);
+});
