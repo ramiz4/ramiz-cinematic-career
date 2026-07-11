@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 type Props = PropsWithChildren<{ id: string; index: string; eyebrow: string; title: string; className?: string }>;
 export function Chapter({ id, index, eyebrow, title, className = '', children }: Props) {
   const reducedMotion = useReducedMotion();
-  const reveal = reducedMotion ? false : { opacity: 0, y: 48 };
+  const reveal = reducedMotion ? false : { y: 48 };
 
   return (
     <section id={id} data-story={id} className={`chapter chapter--${id} ${className}`} aria-labelledby={`${id}-title`}>

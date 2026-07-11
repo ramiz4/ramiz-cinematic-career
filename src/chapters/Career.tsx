@@ -11,7 +11,7 @@ export function Career() {
           <motion.li
             key={entry.company}
             data-story-beat={`career-${index + 1}`}
-            initial={{ opacity: 0, x: index % 2 ? 32 : -32 }}
+            initial={{ x: index % 2 ? 32 : -32 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ amount: .35 }}
             transition={{ duration: .65, ease: [.16, 1, .3, 1] }}

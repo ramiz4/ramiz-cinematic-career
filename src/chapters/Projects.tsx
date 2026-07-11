@@ -13,7 +13,7 @@ export function Projects() {
             key={project.slug}
             data-story-beat={`project-${index + 1}`}
             style={{ '--card-index': index } as CSSProperties}
-            initial={{ opacity: 0, y: 56, rotateX: 8 }}
+            initial={{ y: 56, rotateX: 8 }}
             whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
             whileHover={{ y: -8, rotateX: -1, rotateY: index % 2 ? -1.5 : 1.5 }}
             viewport={{ amount: .18 }}
