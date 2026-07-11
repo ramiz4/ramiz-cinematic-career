@@ -8,8 +8,9 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
+        id: '/ramiz-cinematic-career/',
         name: 'Ramiz Loki — Cinematic Career',
         short_name: 'Ramiz Loki',
         description: 'An immersive software engineering career experience.',
@@ -17,9 +18,12 @@ export default defineConfig({
         background_color: '#050806',
         display: 'standalone',
         start_url: '/ramiz-cinematic-career/',
+        scope: '/ramiz-cinematic-career/',
+        lang: 'en',
         icons: [
-          { src: 'icon-192.svg', sizes: '192x192', type: 'image/svg+xml' },
-          { src: 'icon-512.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
         ]
       },
       workbox: {
