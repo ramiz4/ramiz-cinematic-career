@@ -267,14 +267,66 @@
 
 .system-visual__monolith > path { stroke: rgba(117, 255, 187, .24); }
 .system-visual__monolith > circle { fill: var(--green); opacity: .5; }
+.system-visual__monolith-title { font-size: 11px; }
 
-.system-visual__warning circle {
-  fill: #07130d;
-  stroke: var(--green);
-  stroke-width: 2;
+.system-visual__warning { --system-signal-phase-delay: 0s; }
+.system-visual__warning--phase-2 { --system-signal-phase-delay: -.65s; }
+.system-visual__warning--phase-3 { --system-signal-phase-delay: -1.2s; }
+
+.system-visual__signal-halo {
+  fill: rgba(54, 255, 157, .025);
+  stroke: rgba(117, 255, 187, .72);
+  stroke-width: 1.4;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: system-signal-halo 2.6s ease-in-out infinite;
+  animation-delay: var(--system-signal-phase-delay);
 }
 
-.system-visual__warning path { stroke: var(--green); stroke-width: 2; }
+.system-visual__signal-core {
+  fill: #e8fff1;
+  stroke: none;
+  filter: drop-shadow(0 0 5px var(--green));
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: system-signal-core 1.8s ease-in-out infinite;
+  animation-delay: var(--system-signal-phase-delay);
+}
+
+.system-visual__signal-bubble {
+  fill: var(--green);
+  stroke: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: system-signal-bubble 2.2s ease-in-out infinite alternate;
+  animation-delay: var(--system-signal-phase-delay);
+}
+
+.system-visual__signal-bubble--b {
+  animation-duration: 2.8s;
+  animation-delay: calc(var(--system-signal-phase-delay) - .9s);
+}
+
+.system-visual__signal-bubble--c {
+  animation-duration: 2.4s;
+  animation-delay: calc(var(--system-signal-phase-delay) - 1.4s);
+}
+
+@keyframes system-signal-halo {
+  0%, 100% { opacity: .42; transform: scale(.82); }
+  50% { opacity: .9; transform: scale(1); }
+}
+
+@keyframes system-signal-core {
+  0%, 100% { opacity: .7; transform: scale(.78); }
+  50% { opacity: 1; transform: scale(1.16); }
+}
+
+@keyframes system-signal-bubble {
+  0% { opacity: .48; transform: translateY(1px) scale(.78); }
+  100% { opacity: 1; transform: translateY(-1.5px) scale(1.12); }
+}
+
 .system-visual svg .system-visual__warning text { fill: var(--green); font-size: 10px; text-anchor: start; }
 .system-visual svg .system-visual__warning--centered text { text-anchor: middle; }
 
@@ -404,4 +456,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .system-visual { position: relative; top: auto; }
+  .system-visual__signal-halo,
+  .system-visual__signal-core,
+  .system-visual__signal-bubble { animation: none; }
 }

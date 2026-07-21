@@ -43,6 +43,45 @@ const storyBeats = [
   },
 ] as const;
 
+type ConstraintSignalProps = {
+  x: number;
+  y: number;
+  label: string;
+  labelX: number;
+  labelY: number;
+  centered?: boolean;
+  phase?: 1 | 2 | 3;
+};
+
+function ConstraintSignal({
+  x,
+  y,
+  label,
+  labelX,
+  labelY,
+  centered = false,
+  phase = 1,
+}: ConstraintSignalProps) {
+  const className = [
+    'system-visual__warning',
+    centered ? 'system-visual__warning--centered' : '',
+    `system-visual__warning--phase-${phase}`,
+  ].filter(Boolean).join(' ');
+
+  return (
+    <g data-graph="warning" className={className}>
+      <g className="system-visual__signal" transform={`translate(${x} ${y})`}>
+        <circle className="system-visual__signal-halo" r="13" />
+        <circle className="system-visual__signal-bubble system-visual__signal-bubble--a" cx="-6.5" cy="-4" r="3" />
+        <circle className="system-visual__signal-bubble system-visual__signal-bubble--b" cx="6.5" cy="-5" r="2.25" />
+        <circle className="system-visual__signal-bubble system-visual__signal-bubble--c" cx="4" cy="6.5" r="1.75" />
+        <circle className="system-visual__signal-core" r="2.5" />
+      </g>
+      <text x={labelX} y={labelY}>{label}</text>
+    </g>
+  );
+}
+
 export function SystemTransformation() {
   const rootRef = useRef<HTMLElement>(null);
 
@@ -133,7 +172,7 @@ export function SystemTransformation() {
                 <rect x="244" y="115" width="332" height="350" rx="24" />
                 <path d="M244 174 H576" />
                 <circle cx="278" cy="145" r="6" /><circle cx="300" cy="145" r="6" /><circle cx="322" cy="145" r="6" />
-                <text x="360" y="151">CORE APPLICATION</text>
+                <text className="system-visual__monolith-title" x="430" y="151">CORE APPLICATION</text>
                 <rect x="280" y="208" width="260" height="52" rx="8" />
                 <rect x="280" y="282" width="260" height="52" rx="8" />
                 <rect x="280" y="356" width="260" height="72" rx="8" />
@@ -142,18 +181,9 @@ export function SystemTransformation() {
                 <text x="410" y="399">DATA + OPERATIONS</text>
               </g>
 
-              <g data-graph="warning" className="system-visual__warning">
-                <circle cx="226" cy="250" r="13" /><path d="M226 242 V251 M226 257 V259" />
-                <text x="74" y="255">COUPLED CHANGE</text>
-              </g>
-              <g data-graph="warning" className="system-visual__warning">
-                <circle cx="594" cy="335" r="13" /><path d="M594 327 V336 M594 342 V344" />
-                <text x="618" y="340">WIDE BLAST RADIUS</text>
-              </g>
-              <g data-graph="warning" className="system-visual__warning system-visual__warning--centered">
-                <circle cx="410" cy="487" r="13" /><path d="M410 479 V488 M410 494 V496" />
-                <text x="410" y="528">SLOW FEEDBACK</text>
-              </g>
+              <ConstraintSignal x={226} y={250} label="COUPLED CHANGE" labelX={74} labelY={255} />
+              <ConstraintSignal x={594} y={335} label="WIDE BLAST RADIUS" labelX={618} labelY={340} phase={2} />
+              <ConstraintSignal x={410} y={483} label="SLOW FEEDBACK" labelX={410} labelY={520} centered phase={3} />
 
               <g data-graph="service" className="system-visual__service">
                 <rect x="44" y="250" width="122" height="88" rx="14" /><text x="105" y="288">EDGE</text><text x="105" y="309">API</text>

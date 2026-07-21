@@ -116,7 +116,7 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
       });
       if (graphCamera) gsap.set(graphCamera, { transformBox: 'view-box', transformOrigin: '50% 48%' });
       gsap.set(monolith, { autoAlpha: 1, scale: 1 });
-      gsap.set(warnings, { autoAlpha: 0, scale: .75 });
+      gsap.set(warnings, { autoAlpha: 0 });
       gsap.set(services, { autoAlpha: 0, scale: .72 });
       gsap.set(metrics, { autoAlpha: 0, y: 16 });
       gsap.set(ownershipZones, { autoAlpha: 0, scale: .96 });
@@ -160,10 +160,9 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
       timeline
         .addLabel('pressure', 0)
         .to(scan, { autoAlpha: 0, yPercent: 820, duration: .9 }, 0)
-        .to(monolith, { scale: 1.06, duration: .65 }, 0)
-        .to(warnings, { autoAlpha: 1, scale: 1, duration: .45, stagger: .07 }, .08)
+        .to(warnings, { autoAlpha: 1, duration: .45, stagger: .07 }, .08)
         .addLabel('boundaries', 1)
-        .to(warnings, { autoAlpha: 0, scale: .85, duration: .25 }, .92)
+        .to(warnings, { autoAlpha: 0, duration: .25 }, .92)
         .to(monolith, { autoAlpha: 0, scale: .7, duration: .55 }, 1)
         .to(graphCamera, { scale: .94, duration: .7 }, 1)
         .to(services, { autoAlpha: 1, scale: 1, duration: .7, stagger: .055 }, 1.05)
