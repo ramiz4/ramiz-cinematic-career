@@ -39,8 +39,8 @@ export function initJourneyScrollytelling(root) {
     ring.dataset.pathLength = String(length);
     gsap.set(ring, { strokeDasharray: length, strokeDashoffset: length });
   });
-  gsap.set(beam, { transformBox: 'view-box', transformOrigin: '50% 50%' });
-  gsap.set(core, { transformBox: 'fill-box', transformOrigin: '50% 50%' });
+  gsap.set(beam, { svgOrigin: '160 160' });
+  gsap.set(core, { svgOrigin: '160 160' });
   if (progress) gsap.set(progress, { scaleX: 0, transformOrigin: 'left center' });
 
   const activate = (nextStep, immediate = false) => {
