@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { App } from './App';
+import { SITE_INTRO_SESSION_KEY } from '../components/siteIntroSession';
 
 vi.mock('../experience/ExperienceLayer', () => ({ ExperienceLayer: () => <div data-testid="scene" /> }));
 vi.mock('../components/StoryProgress', () => ({ StoryProgress: () => <div data-testid="story-progress" /> }));
@@ -9,6 +10,8 @@ vi.mock('../js/journey-scrollytelling.js', () => ({ initJourneyScrollytelling: (
 vi.mock('../js/impact-scrollytelling.js', () => ({ initImpactScrollytelling: () => () => undefined }));
 
 describe('App', () => {
+  beforeEach(() => window.sessionStorage.setItem(SITE_INTRO_SESSION_KEY, 'seen'));
+
   it('renders the complete story in an accessible document order', () => {
     render(<MemoryRouter><App /></MemoryRouter>);
     expect(screen.getByRole('heading', { name: /turn technical complexity into business leverage/i })).toBeInTheDocument();

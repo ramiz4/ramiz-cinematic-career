@@ -17,6 +17,7 @@ export function Hero() {
       <div className="hero__sticky">
         <motion.div
           className="hero__content"
+          data-intro-target
           variants={container}
           initial={reducedMotion ? false : 'hidden'}
           animate="visible"
@@ -43,10 +44,10 @@ export function Hero() {
             <div><dt>E2E</dt><dd>Architecture to delivery</dd></div>
           </motion.dl>
         </motion.div>
-        <motion.div className="hero__signal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }} aria-hidden="true">
+        <motion.div className="hero__signal" data-intro-target initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }} aria-hidden="true">
           <span>Leadership system</span><strong>ONLINE</strong>
         </motion.div>
-        <div className="scroll-cue" aria-hidden="true">
+        <div className="scroll-cue" data-intro-target aria-hidden="true">
           <span>Scroll to diagnose</span><i /><b>01</b>
         </div>
       </div>

@@ -1,8 +1,42 @@
 import { expect, test } from '@playwright/test';
 import { IOS_INSTALL_DISMISS_KEY } from '../src/pwa/install';
+import { SITE_INTRO_SESSION_KEY } from '../src/components/siteIntroSession';
 
 test.beforeEach(async ({ page }) => {
-  await page.addInitScript((key) => window.localStorage.setItem(key, 'dismissed'), IOS_INSTALL_DISMISS_KEY);
+  await page.addInitScript(({ installKey, introKey }) => {
+    window.localStorage.setItem(installKey, 'dismissed');
+    window.sessionStorage.setItem(introKey, 'seen');
+  }, { installKey: IOS_INSTALL_DISMISS_KEY, introKey: SITE_INTRO_SESSION_KEY });
+});
+
+test('assembles the interface once and keeps an immediate escape hatch', async ({ page }) => {
+  await page.goto('./?intro=1');
+  const intro = page.locator('[data-site-intro]');
+  const hero = page.locator('.hero__sticky');
+
+  await expect(intro).toBeVisible();
+  await expect(page.locator('.scene canvas')).toHaveCount(0);
+  const before = await hero.boundingBox();
+
+  await page.getByRole('button', { name: 'Skip intro' }).click();
+  await expect(intro).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: /technical complexity into business leverage/i })).toBeVisible();
+  await expect(page.locator('.scene canvas')).toHaveCount(1);
+  expect(await page.evaluate((key) => window.sessionStorage.getItem(key), SITE_INTRO_SESSION_KEY)).toBe('seen');
+
+  const after = await hero.boundingBox();
+  expect(after?.x).toBe(before?.x);
+  expect(after?.y).toBe(before?.y);
+  expect(after?.width).toBe(before?.width);
+  expect(after?.height).toBe(before?.height);
+
+  await page.goto('./');
+  await expect(intro).toHaveCount(0);
+
+  await page.goto('./?intro=1');
+  await expect(intro).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(intro).toHaveCount(0);
 });
 
 test('tells the full scroll story without overflow or runtime errors', async ({ page }) => {
