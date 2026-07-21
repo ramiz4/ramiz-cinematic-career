@@ -301,7 +301,7 @@
   stroke-width: 1;
 }
 
-.system-visual__ownership-zone text {
+.system-visual svg .system-visual__ownership-zone text {
   fill: var(--green);
   font-size: 8px;
   text-anchor: start;
@@ -318,7 +318,7 @@
   stroke-width: 1;
 }
 
-.system-visual__outcome text { text-anchor: start; }
+.system-visual svg .system-visual__outcome text { text-anchor: start; }
 .system-visual__outcome text:first-of-type { fill: #81a58f; font-size: 8px; }
 .system-visual__outcome text:last-of-type { fill: var(--green); font-size: 11px; }
 
