@@ -78,7 +78,6 @@ export function EngineeringOperatingVisual() {
           </g>
 
           <g data-operating-group="deliver" className="os-stage">
-            <text className="os-caption" x="45" y="76">AUTOMATED DELIVERY / IMMUTABLE ARTIFACT</text>
             <path data-operating-path className="os-path os-path--pipeline" d="M118 334H197" markerEnd="url(#operating-arrow)" />
             <path data-operating-path className="os-path os-path--pipeline" d="M253 334H332" markerEnd="url(#operating-arrow)" />
             <path data-operating-path className="os-path os-path--pipeline" d="M388 334H467" markerEnd="url(#operating-arrow)" />
@@ -97,23 +96,42 @@ export function EngineeringOperatingVisual() {
             </g>
             <path data-operating-path className="os-path" d="M765 306V232" markerEnd="url(#operating-arrow)" />
             <g className="os-feedback-node"><rect x="45" y="142" width="150" height="66" rx="10" /><text x="120" y="171">EVIDENCE</text><text className="os-detail" x="120" y="190">NEXT CYCLE</text></g>
-            <path data-operating-path className="os-feedback" d="M680 152C518 54 280 55 195 175" markerEnd="url(#operating-arrow)" />
-            <text className="os-caption" x="270" y="91">TELEMETRY / LEARNING / NEXT DECISION</text>
+            <path data-operating-path className="os-feedback" d="M680 152C555 112 332 110 195 175" markerEnd="url(#operating-arrow)" />
+            <g className="os-flow-callout os-flow-callout--feedback">
+              <rect x="315" y="50" width="300" height="64" rx="10" />
+              <circle cx="337" cy="73" r="3" />
+              <text className="os-flow-callout__label" x="352" y="77">TELEMETRY LOOP</text>
+              <text className="os-flow-callout__value" x="337" y="101">EVIDENCE → NEXT DECISION</text>
+              <path d="M465 114V124" />
+            </g>
+            <g className="os-flow-callout os-flow-callout--artifact">
+              <rect x="120" y="238" width="210" height="58" rx="10" />
+              <circle cx="142" cy="260" r="3" />
+              <text className="os-flow-callout__label" x="157" y="264">DOCKER OUTPUT</text>
+              <text className="os-flow-callout__value" x="142" y="287">IMMUTABLE IMAGE</text>
+              <path d="M225 296V306" />
+            </g>
             <g className="os-outcome"><rect x="275" y="482" width="350" height="62" rx="31" /><circle cx="311" cy="513" r="6" /><text x="455" y="518">PRODUCTION HEALTHY · FEEDBACK OPEN</text></g>
           </g>
         </svg>
       </div>
 
-      <dl className="operating-visual__principles" aria-label="Engineering decision filters">
-        {decisionFilters.map((filter, index) => (
-          <div key={filter.principle}>
-            <span>0{index + 1}</span>
-            <dt>{filter.principle}</dt>
-            <dd className="decision-filter__meaning">{filter.meaning}</dd>
-            <dd className="decision-filter__effect">{filter.effect}</dd>
-          </div>
-        ))}
-      </dl>
+      <section className="decision-console" aria-label="Engineering decision filters">
+        <header className="decision-console__header" aria-hidden="true">
+          <span>decision.filters</span>
+          <strong><i />04 GUARDRAILS ACTIVE</strong>
+        </header>
+        <dl className="operating-visual__principles">
+          {decisionFilters.map((filter, index) => (
+            <div key={filter.principle}>
+              <span>0{index + 1}</span>
+              <dt>{filter.principle}</dt>
+              <dd className="decision-filter__meaning">{filter.meaning}</dd>
+              <dd className="decision-filter__effect">{filter.effect}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
 
       <div className="operating-visual__rail" aria-hidden="true">
         <div><span>Analyze</span><span>Verify</span><span>Structure</span><span>Parallelize</span><span>Deliver</span></div>
