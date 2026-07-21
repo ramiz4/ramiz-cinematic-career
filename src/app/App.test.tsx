@@ -4,17 +4,18 @@ import { App } from './App';
 
 vi.mock('../experience/ExperienceLayer', () => ({ ExperienceLayer: () => <div data-testid="scene" /> }));
 vi.mock('../components/StoryProgress', () => ({ StoryProgress: () => <div data-testid="story-progress" /> }));
+vi.mock('../js/scrollytelling.js', () => ({ initSystemGraphScrollytelling: () => () => undefined }));
 
 describe('App', () => {
   it('renders the complete story in an accessible document order', () => {
     render(<MemoryRouter><App /></MemoryRouter>);
-    expect(screen.getByRole('heading', { name: /engineer systems that move businesses/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /turn technical complexity into business leverage/i })).toBeInTheDocument();
     for (const heading of [
-      'Architecture is a living network.',
-      'From building websites to shaping product systems.',
-      'Products, not portfolio tiles.',
-      'Clarity is a feature.',
-      'Let’s build the next system.',
+      'Scale the system. Then scale change.',
+      'From shipping features to shaping the system.',
+      'Decisions become product outcomes.',
+      'Leadership scales through clarity.',
+      'Let’s turn complexity into leverage.',
     ]) expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument();
     expect(document.querySelectorAll('[data-story]')).toHaveLength(6);
     expect(screen.getByRole('main')).toHaveAttribute('tabindex', '-1');
@@ -24,7 +25,7 @@ describe('App', () => {
     render(<MemoryRouter><App /></MemoryRouter>);
     fireEvent.click(screen.getByRole('button', { name: 'Open journey menu' }));
     expect(screen.getByRole('dialog', { name: 'Your journey' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '1. Origin' })).toHaveAttribute('href', '#hero');
+    expect(screen.getByRole('link', { name: '1. Position' })).toHaveAttribute('href', '#hero');
     expect(screen.getByRole('button', { name: 'Close journey menu' })).toHaveAttribute('aria-expanded', 'true');
   });
 });

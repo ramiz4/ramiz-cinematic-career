@@ -11,9 +11,9 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         id: '/ramiz-cinematic-career/',
-        name: 'Ramiz Loki — Cinematic Career',
+        name: 'Ramiz Loki — Technology Leadership',
         short_name: 'Ramiz Loki',
-        description: 'An immersive software engineering career experience.',
+        description: 'Architecture, delivery and technical leadership translated into business leverage.',
         theme_color: '#07130d',
         background_color: '#050806',
         display: 'standalone',

@@ -1,14 +1,6 @@
 import { motion, useMotionValueEvent, useScroll } from 'framer-motion';
 import { useState } from 'react';
-
-const stages = [
-  ['hero', 'Origin'],
-  ['universe', 'System'],
-  ['career', 'Journey'],
-  ['projects', 'Products'],
-  ['architect', 'Clarity'],
-  ['contact', 'Next'],
-] as const;
+import { STORY_PHASES } from '../experience/storyPhases';
 
 export function StoryProgress() {
   const { scrollYProgress } = useScroll();
@@ -17,12 +9,12 @@ export function StoryProgress() {
   useMotionValueEvent(scrollYProgress, 'change', () => {
     const viewportCenter = window.scrollY + window.innerHeight * .5;
     let next = 0;
-    stages.forEach(([id], index) => {
-      const section = document.getElementById(id);
+    STORY_PHASES.forEach((phase, index) => {
+      const section = document.getElementById(phase.id);
       if (section && section.offsetTop <= viewportCenter) next = index;
     });
     setActive((current) => current === next ? current : next);
-    document.documentElement.dataset.storyPhase = stages[next][0];
+    document.documentElement.dataset.storyPhase = STORY_PHASES[next].id;
   });
 
   return (
@@ -32,16 +24,16 @@ export function StoryProgress() {
         <motion.span style={{ scaleX: scrollYProgress, scaleY: scrollYProgress }} />
       </div>
       <ol>
-        {stages.map(([id, label], index) => (
-          <li key={id} className={index === active ? 'is-active' : ''}>
-            <a href={`#${id}`} aria-current={index === active ? 'step' : undefined}>
+        {STORY_PHASES.map((phase, index) => (
+          <li key={phase.id} className={index === active ? 'is-active' : ''}>
+            <a href={`#${phase.id}`} aria-current={index === active ? 'step' : undefined}>
               <i aria-hidden="true" />
-              <span>{label}</span>
+              <span>{phase.progressLabel}</span>
             </a>
           </li>
         ))}
       </ol>
-      <span className="story-progress__mobile-label">{stages[active][1]}</span>
+      <span className="story-progress__mobile-label">{STORY_PHASES[active].progressLabel}</span>
     </aside>
   );
 }

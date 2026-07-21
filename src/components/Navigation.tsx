@@ -1,14 +1,6 @@
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-
-const routes = [
-  ['hero', 'Origin'],
-  ['universe', 'Universe'],
-  ['career', 'Career'],
-  ['projects', 'Projects'],
-  ['architect', 'Architect'],
-  ['contact', 'Contact'],
-] as const;
+import { STORY_PHASES } from '../experience/storyPhases';
 
 export function Navigation() {
   const { scrollY, scrollYProgress } = useScroll();
@@ -22,8 +14,8 @@ export function Navigation() {
     setScrolled(latest > 24);
     const viewportCenter = latest + window.innerHeight * .42;
     let next = 0;
-    routes.forEach(([id], index) => {
-      const section = document.getElementById(id);
+    STORY_PHASES.forEach((phase, index) => {
+      const section = document.getElementById(phase.id);
       if (section && section.offsetTop <= viewportCenter) next = index;
     });
     setActive((current) => current === next ? current : next);
@@ -56,16 +48,16 @@ export function Navigation() {
         <span className="brand__mark"><b>RL</b><i /><i /></span>
         <span className="brand__word">Ramiz Loki</span>
       </a>
-      <div className="nav__links">{routes.slice(1).map(([id, label]) => <a key={id} href={`#${id}`}>{label}</a>)}</div>
+      <div className="nav__links">{STORY_PHASES.slice(1).map((phase) => <a key={phase.id} href={`#${phase.id}`}>{phase.navigationLabel}</a>)}</div>
       <div className="nav__mobile-status" aria-hidden="true">
         <span><i /> Journey 0{active + 1}</span>
         <AnimatePresence mode="wait" initial={false}>
-          <motion.strong key={routes[active][0]} initial={{ opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -7 }} transition={{ duration: .2 }}>
-            {routes[active][1]}
+          <motion.strong key={STORY_PHASES[active].id} initial={{ opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -7 }} transition={{ duration: .2 }}>
+            {STORY_PHASES[active].navigationLabel}
           </motion.strong>
         </AnimatePresence>
       </div>
-      <a className="nav__cta" href="mailto:me@ramizloki.com">Contact</a>
+      <a className="nav__cta" href="mailto:me@ramizloki.com?subject=Technology%20leadership%20conversation">Let’s talk</a>
       <button
         ref={toggleRef}
         className="nav__menu-toggle"
@@ -99,16 +91,16 @@ export function Navigation() {
             <strong id="mobile-menu-title">Your journey</strong>
           </div>
           <ol>
-            {routes.map(([id, label], index) => (
-              <motion.li key={id} initial={{ opacity: 0, x: 28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: .08 + index * .045 }}>
-                <a ref={index === 0 ? firstLinkRef : undefined} href={`#${id}`} onClick={closeMenu} aria-label={`${index + 1}. ${label}`} aria-current={index === active ? 'page' : undefined}>
-                  <span>0{index + 1}</span><strong>{label}</strong><i aria-hidden="true">↘</i>
+            {STORY_PHASES.map((phase, index) => (
+              <motion.li key={phase.id} initial={{ opacity: 0, x: 28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: .08 + index * .045 }}>
+                <a ref={index === 0 ? firstLinkRef : undefined} href={`#${phase.id}`} onClick={closeMenu} aria-label={`${index + 1}. ${phase.navigationLabel}`} aria-current={index === active ? 'page' : undefined}>
+                  <span>0{index + 1}</span><strong>{phase.navigationLabel}</strong><i aria-hidden="true">↘</i>
                 </a>
               </motion.li>
             ))}
           </ol>
-          <a className="mobile-menu__contact" href="mailto:me@ramizloki.com" onClick={closeMenu}>
-            <span>Start a conversation</span><i aria-hidden="true">↗</i>
+          <a className="mobile-menu__contact" href="mailto:me@ramizloki.com?subject=Technology%20leadership%20conversation" onClick={closeMenu}>
+            <span>Discuss a leadership mandate</span><i aria-hidden="true">↗</i>
           </a>
         </motion.div>
       )}

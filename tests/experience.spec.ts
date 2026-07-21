@@ -11,10 +11,10 @@ test('tells the full scroll story without overflow or runtime errors', async ({ 
   page.on('pageerror', (error) => errors.push(error.message));
 
   await page.goto('./');
-  await expect(page.getByRole('heading', { name: /systems that move businesses/i })).toBeVisible();
-  await expect(page.locator('section.chapter')).toHaveCount(5);
+  await expect(page.getByRole('heading', { name: /technical complexity into business leverage/i })).toBeVisible();
+  await expect(page.locator('[data-story]')).toHaveCount(6);
 
-  for (const phase of ['universe', 'career', 'projects', 'architect', 'contact']) {
+  for (const phase of ['system', 'journey', 'impact', 'leadership', 'contact']) {
     await page.locator(`#${phase}`).evaluate((element) => element.scrollIntoView({ block: 'start' }));
     await expect(page.locator('html')).toHaveAttribute('data-story-phase', phase);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
@@ -29,17 +29,33 @@ test('uses the static story artwork when reduced motion is requested', async ({ 
   await page.goto('./');
   await expect(page.getByTestId('static-scene')).toBeVisible();
   await expect(page.locator('.scene canvas')).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: /systems that move businesses/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /technical complexity into business leverage/i })).toBeVisible();
   await expect(page.locator('[data-story]')).toHaveCount(6);
+  await expect(page.locator('[data-system-story]')).toHaveAttribute('data-motion', 'reduced');
 });
 
 test('keeps every story chapter visible in a full-page mobile capture', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile full-page capture regression');
   await page.goto('./');
-  await expect(page.getByRole('heading', { name: /systems that move businesses/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /technical complexity into business leverage/i })).toBeVisible();
+  await expect(page.locator('[data-system-story]')).toHaveAttribute('data-motion', 'compact');
   for (const heading of await page.locator('main h2').all()) await expect(heading).toBeVisible();
   const capture = await page.screenshot({ fullPage: true });
   expect(capture.byteLength).toBeGreaterThan(20_000);
+});
+
+test('scrubs the system graph through the five architecture decisions', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Desktop pinned graph behavior');
+  await page.goto('./');
+
+  const stage = page.locator('[data-system-scroll]');
+  await stage.evaluate((element) => {
+    const top = element.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: top + element.scrollHeight * .9, behavior: 'auto' });
+  });
+
+  await expect(page.locator('[data-story-step="ownership"]')).toHaveClass(/is-active/);
+  await expect(page.locator('[data-system-story]')).toHaveAttribute('data-motion', 'pinned');
 });
 
 test('keeps mobile sections bounded when Safari expands the capture viewport', async ({ page }, testInfo) => {

@@ -15,8 +15,8 @@ import {
   type InstancedMesh,
   type LineSegments,
 } from 'three';
+import { STORY_PHASES } from './storyPhases';
 
-const STORY_PHASES = ['hero', 'universe', 'career', 'projects', 'architect', 'contact'] as const;
 const LINK_COUNT = 28;
 
 type SceneProps = { compact?: boolean };
@@ -162,7 +162,7 @@ function EngineeringEngine({ compact = false }: SceneProps) {
 
     if (activePhase.current !== Math.round(position)) {
       activePhase.current = Math.round(position);
-      document.documentElement.dataset.storyPhase = STORY_PHASES[activePhase.current];
+      document.documentElement.dataset.storyPhase = STORY_PHASES[activePhase.current].id;
     }
 
     for (let index = 0; index < count; index += 1) {

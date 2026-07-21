@@ -3,10 +3,10 @@ import { StoryProgress } from '../components/StoryProgress';
 import { InstallPrompt } from '../components/InstallPrompt';
 import { ExperienceLayer } from '../experience/ExperienceLayer';
 import { Hero } from '../chapters/Hero';
-import { Universe } from '../chapters/Universe';
-import { Career } from '../chapters/Career';
-import { Projects } from '../chapters/Projects';
-import { Architect } from '../chapters/Architect';
+import { SystemTransformation } from '../chapters/SystemTransformation';
+import { LeadershipJourney } from '../chapters/LeadershipJourney';
+import { Impact } from '../chapters/Impact';
+import { OperatingModel } from '../chapters/OperatingModel';
 import { Contact } from '../chapters/Contact';
 
 export function App() {
@@ -18,10 +18,10 @@ export function App() {
     <ExperienceLayer />
     <main id="main" tabIndex={-1}>
       <Hero />
-      <Universe />
-      <Career />
-      <Projects />
-      <Architect />
+      <SystemTransformation />
+      <LeadershipJourney />
+      <Impact />
+      <OperatingModel />
       <Contact />
     </main>
     <footer>© {new Date().getFullYear()} Ramiz Loki · Engineered with intent.</footer>

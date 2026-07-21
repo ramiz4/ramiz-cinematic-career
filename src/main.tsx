@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from './app/App';
 import './styles/global.css';
+import './styles/scrollytelling/system-transformation.css';
+import './styles/scrollytelling/leadership.css';
 
 const freezeMobileViewportHeight = () => {
   const viewportHeight = Math.round(window.visualViewport?.height ?? window.innerHeight);
