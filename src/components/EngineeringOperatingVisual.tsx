@@ -52,7 +52,9 @@ export function EngineeringOperatingVisual() {
             <g className="os-node"><rect x="50" y="246" width="160" height="80" rx="12" /><text x="130" y="280">VERIFIED</text><text x="130" y="302">REQUIREMENT</text></g>
             <path data-operating-path className="os-path" d="M210 286H312" markerEnd="url(#operating-arrow)" />
             <g className="os-node os-node--accent"><rect x="326" y="236" width="160" height="100" rx="12" /><text x="406" y="276">EPIC</text><text className="os-detail" x="406" y="302">OUTCOME BOUNDARY</text></g>
-            <path data-operating-path className="os-path" d="M486 286C546 286 526 128 596 128M486 286H596M486 286C546 286 526 444 596 444" />
+            <path data-operating-path className="os-path" d="M486 286C546 286 526 128 610 128" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path" d="M486 286H610" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path" d="M486 286C546 286 526 444 610 444" markerEnd="url(#operating-arrow)" />
             <g className="os-ticket"><rect x="610" y="80" width="230" height="96" rx="10" /><text x="635" y="116">TICKET / A</text><text className="os-detail" x="635" y="141">INDEPENDENT · READY</text></g>
             <g className="os-ticket os-ticket--dependent"><rect x="610" y="238" width="230" height="96" rx="10" /><text x="635" y="274">TICKET / B</text><text className="os-detail" x="635" y="299">DEPENDS ON A</text></g>
             <g className="os-ticket"><rect x="610" y="396" width="230" height="96" rx="10" /><text x="635" y="432">TICKET / C</text><text className="os-detail" x="635" y="457">INDEPENDENT · READY</text></g>
@@ -64,17 +66,24 @@ export function EngineeringOperatingVisual() {
             <g className="os-ticket"><rect x="55" y="102" width="170" height="78" rx="10" /><text x="80" y="136">TICKET / A</text><text className="os-detail" x="80" y="158">READY</text></g>
             <g className="os-ticket os-ticket--dependent"><rect x="55" y="247" width="170" height="78" rx="10" /><text x="80" y="281">TICKET / B</text><text className="os-detail" x="80" y="303">WAITING ON A</text></g>
             <g className="os-ticket"><rect x="55" y="392" width="170" height="78" rx="10" /><text x="80" y="426">TICKET / C</text><text className="os-detail" x="80" y="448">READY</text></g>
-            <path data-operating-path className="os-path" d="M225 141H342M225 286H342M225 431H342" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path" d="M225 141H356" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path" d="M225 286H356" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path" d="M225 431H356" markerEnd="url(#operating-arrow)" />
             <g className="os-lane"><rect x="356" y="91" width="260" height="100" rx="10" /><circle cx="389" cy="141" r="16" /><text x="425" y="132">WORKTREE / A</text><text className="os-detail" x="425" y="157">AI AGENT · CHECKS GREEN</text></g>
             <g className="os-lane os-lane--waiting"><rect x="356" y="236" width="260" height="100" rx="10" /><circle cx="389" cy="286" r="16" /><text x="425" y="277">WORKTREE / B</text><text className="os-detail" x="425" y="302">DEPENDENCY GATE</text></g>
             <g className="os-lane"><rect x="356" y="381" width="260" height="100" rx="10" /><circle cx="389" cy="431" r="16" /><text x="425" y="422">WORKTREE / C</text><text className="os-detail" x="425" y="447">AI AGENT · CHECKS GREEN</text></g>
-            <path data-operating-path className="os-path" d="M616 141C684 141 660 254 716 270M616 431C684 431 660 318 716 302" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path" d="M616 141C684 141 660 254 730 270" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path" d="M616 431C684 431 660 318 730 302" markerEnd="url(#operating-arrow)" />
             <g className="os-gate"><rect x="730" y="214" width="125" height="144" rx="12" /><circle cx="792" cy="252" r="16" /><path d="M784 252L790 258L801 245" /><text x="792" y="299">PULL</text><text x="792" y="318">REQUEST</text><text className="os-detail" x="792" y="339">HUMAN REVIEW</text></g>
           </g>
 
           <g data-operating-group="deliver" className="os-stage">
             <text className="os-caption" x="45" y="76">AUTOMATED DELIVERY / IMMUTABLE ARTIFACT</text>
-            <path data-operating-path className="os-path os-path--pipeline" d="M72 334H824" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path os-path--pipeline" d="M118 334H197" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path os-path--pipeline" d="M253 334H332" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path os-path--pipeline" d="M388 334H467" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path os-path--pipeline" d="M523 334H602" markerEnd="url(#operating-arrow)" />
+            <path data-operating-path className="os-path os-path--pipeline" d="M658 334H737" markerEnd="url(#operating-arrow)" />
             <g className="os-pipeline-node"><circle cx="90" cy="334" r="28" /><text x="90" y="390">GITHUB</text><text className="os-detail" x="90" y="406">ACTIONS</text></g>
             <g className="os-pipeline-node"><circle cx="225" cy="334" r="28" /><text x="225" y="390">DOCKER</text><text className="os-detail" x="225" y="406">IMAGE</text></g>
             <g className="os-pipeline-node"><circle cx="360" cy="334" r="28" /><text x="360" y="390">PR</text><text className="os-detail" x="360" y="406">PREVIEW</text></g>
@@ -86,8 +95,10 @@ export function EngineeringOperatingVisual() {
               <rect x="704" y="169" width="30" height="34" rx="5" /><rect x="750" y="169" width="30" height="34" rx="5" /><rect x="796" y="169" width="30" height="34" rx="5" />
               <text className="os-detail" x="765" y="220">3 / 3 HEALTHY</text>
             </g>
-            <path data-operating-path className="os-feedback" d="M765 306V250C765 104 210 92 118 224" markerEnd="url(#operating-arrow)" />
-            <text className="os-caption" x="202" y="115">TELEMETRY / LEARNING / NEXT DECISION</text>
+            <path data-operating-path className="os-path" d="M765 306V232" markerEnd="url(#operating-arrow)" />
+            <g className="os-feedback-node"><rect x="45" y="142" width="150" height="66" rx="10" /><text x="120" y="171">EVIDENCE</text><text className="os-detail" x="120" y="190">NEXT CYCLE</text></g>
+            <path data-operating-path className="os-feedback" d="M680 152C518 54 280 55 195 175" markerEnd="url(#operating-arrow)" />
+            <text className="os-caption" x="270" y="91">TELEMETRY / LEARNING / NEXT DECISION</text>
             <g className="os-outcome"><rect x="275" y="482" width="350" height="62" rx="31" /><circle cx="311" cy="513" r="6" /><text x="455" y="518">PRODUCTION HEALTHY · FEEDBACK OPEN</text></g>
           </g>
         </svg>
@@ -95,7 +106,12 @@ export function EngineeringOperatingVisual() {
 
       <dl className="operating-visual__principles" aria-label="Engineering decision filters">
         {decisionFilters.map((filter, index) => (
-          <div key={filter.principle}><span>0{index + 1}</span><dt>{filter.principle}</dt><dd>{filter.effect}</dd></div>
+          <div key={filter.principle}>
+            <span>0{index + 1}</span>
+            <dt>{filter.principle}</dt>
+            <dd className="decision-filter__meaning">{filter.meaning}</dd>
+            <dd className="decision-filter__effect">{filter.effect}</dd>
+          </div>
         ))}
       </dl>
 

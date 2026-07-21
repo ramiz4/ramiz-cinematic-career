@@ -30,6 +30,9 @@ describe('App', () => {
     expect(document.querySelectorAll('[data-operating-step]')).toHaveLength(5);
     expect(document.querySelectorAll('.operating-visual__principles > div')).toHaveLength(4);
     expect(screen.getByText('GitHub Actions')).toBeInTheDocument();
+    expect(screen.getByText(/Single Responsibility · Open\/Closed/)).toBeInTheDocument();
+    expect(screen.getByText('Don’t Repeat Yourself')).toBeInTheDocument();
+    expect(screen.getByText('You Aren’t Gonna Need It')).toBeInTheDocument();
     expect(screen.getByRole('main')).toHaveAttribute('tabindex', '-1');
   });
 

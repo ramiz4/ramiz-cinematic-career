@@ -59,8 +59,24 @@ export const operatingStages: OperatingStage[] = [
 ];
 
 export const decisionFilters = [
-  { principle: 'Clean Architecture', effect: 'Dependencies point inward' },
-  { principle: 'SOLID', effect: 'Change stays local' },
-  { principle: 'DRY', effect: 'One source of truth' },
-  { principle: 'YAGNI', effect: 'Only proven complexity' },
+  {
+    principle: 'Clean Architecture',
+    meaning: 'The Dependency Rule',
+    effect: 'Domain and use cases stay independent of UI, frameworks and infrastructure.',
+  },
+  {
+    principle: 'SOLID',
+    meaning: 'Single Responsibility · Open/Closed · Liskov Substitution · Interface Segregation · Dependency Inversion',
+    effect: 'Five design principles for maintainable, extensible object-oriented systems.',
+  },
+  {
+    principle: 'DRY',
+    meaning: 'Don’t Repeat Yourself',
+    effect: 'Avoid duplicated knowledge; keep each rule authoritative in one place.',
+  },
+  {
+    principle: 'YAGNI',
+    meaning: 'You Aren’t Gonna Need It',
+    effect: 'Implement verified requirements, not speculative flexibility.',
+  },
 ] as const;

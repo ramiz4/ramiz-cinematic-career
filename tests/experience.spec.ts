@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator } from '@playwright/test';
 import { IOS_INSTALL_DISMISS_KEY } from '../src/pwa/install';
 import { SITE_INTRO_SESSION_KEY } from '../src/components/siteIntroSession';
 
@@ -133,11 +133,20 @@ test('moves verified intent through a dependency-aware engineering system', asyn
   await expect(page.locator('[data-operating-index]')).toHaveText('02 / 05');
   await expect(page.locator('[data-operating-label]')).toHaveText('Human verified');
 
+  const structure = page.locator('[data-operating-step="structure"]');
+  await structure.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await expect(structure).toHaveClass(/is-active/);
+  await expect(story).toHaveAttribute('data-operating-stage', '3');
+  await expect(page.locator('[data-operating-group="structure"]')).toHaveCSS('visibility', 'visible');
+  expect(await labelsStayInsideFrames(page.locator('[data-operating-group="structure"] .os-ticket'))).toBeTruthy();
+
   const parallelize = page.locator('[data-operating-step="parallelize"]');
   await parallelize.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   await expect(parallelize).toHaveClass(/is-active/);
   await expect(story).toHaveAttribute('data-operating-stage', '4');
   await expect(page.locator('[data-operating-group="parallelize"]')).toHaveCSS('visibility', 'visible');
+  expect(await labelsStayInsideFrames(page.locator('[data-operating-group="parallelize"] .os-ticket'))).toBeTruthy();
+  expect(await labelsStayInsideFrames(page.locator('[data-operating-group="parallelize"] .os-lane'))).toBeTruthy();
   await expect(page.locator('html')).toHaveAttribute('data-story-focus', 'leadership');
   await expect(page.locator('.story-progress')).toHaveCSS('opacity', '0');
 
@@ -146,7 +155,21 @@ test('moves verified intent through a dependency-aware engineering system', asyn
   await expect(deliver).toHaveClass(/is-active/);
   await expect(story).toHaveAttribute('data-operating-stage', '5');
   await expect(page.locator('[data-operating-group="deliver"]')).toHaveCSS('visibility', 'visible');
+  await expect(page.locator('[data-operating-group="deliver"] .os-feedback-node')).toHaveCSS('visibility', 'visible');
 });
+
+async function labelsStayInsideFrames(groups: Locator) {
+  return groups.evaluateAll((elements) => elements.every((element) => {
+    const frame = element.querySelector('rect')?.getBoundingClientRect();
+    if (!frame) return false;
+
+    return Array.from(element.querySelectorAll('text')).every((label) => {
+      const bounds = label.getBoundingClientRect();
+      return bounds.left >= frame.left && bounds.right <= frame.right
+        && bounds.top >= frame.top && bounds.bottom <= frame.bottom;
+    });
+  }));
+}
 
 test('keeps mobile sections bounded when Safari expands the capture viewport', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile Safari viewport regression');
