@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'framer-motion';
+import { AnimatePresence, LayoutGroup, motion, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { STORY_PHASES } from '../experience/storyPhases';
 
@@ -7,6 +7,7 @@ export function Navigation() {
   const [active, setActive] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
@@ -44,11 +45,33 @@ export function Navigation() {
 
   return <>
     <nav className={`nav ${scrolled ? 'nav--scrolled' : ''} ${open ? 'nav--open' : ''}`} aria-label="Primary">
-      <a className="brand" href="#hero" aria-label="Back to the beginning">
+      <a className="brand" href="#hero" aria-label="Back to the beginning" aria-current={active === 0 ? 'page' : undefined}>
         <span className="brand__mark"><b>RL</b><i /><i /></span>
         <span className="brand__word">Ramiz Loki</span>
       </a>
-      <div className="nav__links">{STORY_PHASES.slice(1).map((phase) => <a key={phase.id} href={`#${phase.id}`}>{phase.navigationLabel}</a>)}</div>
+      <LayoutGroup id="primary-navigation">
+        <div className="nav__links">
+          {STORY_PHASES.slice(1).map((phase, index) => {
+            const phaseIndex = index + 1;
+            const isActive = phaseIndex === active;
+
+            return (
+              <a key={phase.id} href={`#${phase.id}`} className={isActive ? 'is-active' : undefined} aria-current={isActive ? 'page' : undefined}>
+                <span className="nav__link-dot" aria-hidden="true" />
+                <span className="nav__link-label">{phase.navigationLabel}</span>
+                {isActive && (
+                  <motion.span
+                    className="nav__active-track"
+                    layoutId="primary-navigation-active-track"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 34, mass: .55 }}
+                    aria-hidden="true"
+                  />
+                )}
+              </a>
+            );
+          })}
+        </div>
+      </LayoutGroup>
       <div className="nav__mobile-status" aria-hidden="true">
         <span><i /> Journey 0{active + 1}</span>
         <AnimatePresence mode="wait" initial={false}>
