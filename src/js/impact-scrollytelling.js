@@ -68,7 +68,7 @@ export function initImpactScrollytelling(root) {
             trigger: caseElement,
             start: 'top top+=96',
             end: 'bottom bottom-=64',
-            scrub: .4,
+            scrub: .75,
             onToggle: (trigger) => caseElement.classList.toggle('is-active', trigger.isActive),
             onUpdate: (trigger) => {
               const stage = Math.min(2, Math.floor(trigger.progress * 3));

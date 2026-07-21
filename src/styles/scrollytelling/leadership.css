@@ -2,6 +2,8 @@
 .chapter--impact { align-content: start; min-height: auto; }
 
 .journey-system {
+  --story-beat-distance: 88svh;
+
   display: grid;
   grid-template-columns: minmax(17rem, .56fr) minmax(0, 1.44fr);
   gap: clamp(2rem, 4vw, 4.5rem);
@@ -106,7 +108,7 @@
   grid-template-columns: minmax(13rem, .82fr) 1.18fr;
   align-content: center;
   gap: clamp(1.5rem, 3vw, 3rem);
-  min-height: 72svh;
+  min-height: var(--story-beat-distance);
   margin-left: 1rem;
   padding: 2.4rem 1.5rem 2.4rem 3rem;
   border-top: 1px solid var(--line);
@@ -147,11 +149,17 @@
 .leadership-timeline__scope li,
 .impact-case__footer li { padding: .45rem .65rem; border: 1px solid var(--line); border-radius: 999px; color: #b8cec0; font-size: .68rem; }
 
-.impact-cases { display: grid; margin-top: 4rem; }
+.impact-cases {
+  --impact-case-distance: 215svh;
+  --impact-mobile-stage-distance: 52svh;
+
+  display: grid;
+  margin-top: 4rem;
+}
 
 .impact-cases > article {
   position: relative;
-  min-height: 125svh;
+  min-height: var(--impact-case-distance);
 }
 
 .impact-case__card {
@@ -288,7 +296,7 @@
   .chapter--journey,
   .chapter--impact { padding-top: 8rem; }
 
-  .journey-system { grid-template-columns: 1fr; gap: 0; margin-top: 2.5rem; }
+  .journey-system { --story-beat-distance: 76svh; grid-template-columns: 1fr; gap: 0; margin-top: 2.5rem; }
   .journey-radar {
     top: 5.15rem;
     z-index: 3;
@@ -305,7 +313,7 @@
 
   .leadership-timeline { margin-top: 0; }
   .leadership-timeline::before { left: .35rem; }
-  .leadership-timeline > li { grid-template-columns: 1fr; gap: 1.6rem; min-height: 66svh; margin-left: .35rem; padding: 10rem .25rem 3rem 1.5rem; }
+  .leadership-timeline > li { grid-template-columns: 1fr; gap: 1.6rem; min-height: var(--story-beat-distance); margin-left: .35rem; padding: 10rem .25rem 3rem 1.5rem; }
   .leadership-timeline__node { left: -.31rem; top: 2rem; width: .62rem; height: .62rem; }
   .leadership-timeline__index { right: .25rem; font-size: 3.5rem; }
 
@@ -315,7 +323,7 @@
   .impact-cases header > p { margin-top: .8rem; }
   .impact-case__sequence { grid-template-columns: 1fr; background: transparent; }
   .impact-case__sequence::after { display: none; }
-  .impact-case__sequence div { min-height: 42svh; border-top: 1px solid var(--line); }
+  .impact-case__sequence div { min-height: var(--impact-mobile-stage-distance); border-top: 1px solid var(--line); }
   .impact-case__sequence div::before { left: .9rem; top: 1rem; }
   .impact-cases dt { padding-left: 1rem; }
   .impact-case__footer { align-items: flex-start; flex-direction: column; }

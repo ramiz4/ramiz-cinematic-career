@@ -1,6 +1,8 @@
 .chapter--leadership { align-content: start; min-height: auto; padding-bottom: 12rem; }
 
 .operating-system {
+  --story-beat-distance: 92svh;
+
   display: grid;
   grid-template-columns: minmax(18rem, .7fr) minmax(0, 1.3fr);
   gap: clamp(2rem, 5vw, 6rem);
@@ -12,7 +14,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 76svh;
+  min-height: var(--story-beat-distance);
   padding: 3rem 0;
   opacity: .2;
   transform: translateY(1.5rem);
@@ -209,7 +211,7 @@
 
 @media (max-width: 800px) {
   .chapter--leadership { padding-top: 8rem; padding-bottom: 9rem; }
-  .operating-system { grid-template-columns: 1fr; gap: 0; margin-top: 2.5rem; }
+  .operating-system { --story-beat-distance: 74svh; grid-template-columns: 1fr; gap: 0; margin-top: 2.5rem; }
   .operating-visual { order: 0; top: 5.1rem; width: 100%; height: 23rem; min-height: 0; box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, .58); }
   .operating-visual__header { grid-template-columns: 1fr auto; gap: .5rem; margin: .65rem .7rem 0; padding-bottom: .55rem; font-size: .44rem; }
   .operating-visual__header > div { justify-self: end; }
@@ -229,7 +231,7 @@
   .operating-visual__rail { margin: .55rem .7rem .7rem; }
   .operating-visual__rail > div { font-size: .36rem; }
   .operating-system__steps { order: 1; }
-  .operating-system__steps > li { justify-content: flex-end; min-height: 62svh; padding: 12rem .4rem 3rem; }
+  .operating-system__steps > li { justify-content: flex-end; min-height: var(--story-beat-distance); padding: 12rem .4rem 3rem; }
   .operating-system h3 { font-size: clamp(2.5rem, 12vw, 4rem); }
   .operating-system__steps p { font-size: .9rem; }
 }

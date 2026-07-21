@@ -147,7 +147,7 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
           trigger: scrollRegion,
           start: desktop ? 'top top' : 'top 65%',
           end: desktop ? 'bottom bottom' : 'bottom 35%',
-          scrub: desktop ? .65 : .35,
+          scrub: desktop ? .9 : .45,
           pin: desktop ? visual : false,
           pinSpacing: false,
           anticipatePin: desktop ? 1 : 0,

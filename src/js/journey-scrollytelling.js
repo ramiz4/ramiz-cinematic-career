@@ -57,7 +57,7 @@ export function initJourneyScrollytelling(root) {
     if (indexLabel) indexLabel.textContent = `Scope ${String(nextStep + 1).padStart(2, '0')}`;
     if (scopeLabel) scopeLabel.textContent = steps[nextStep]?.dataset.scope ?? '';
 
-    const duration = immediate ? 0 : .55;
+    const duration = immediate ? 0 : .7;
     rings.forEach((ring, index) => {
       const reached = index <= nextStep;
       gsap.to(ring, {

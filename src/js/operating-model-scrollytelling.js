@@ -65,11 +65,11 @@ export function initOperatingModelScrollytelling(root) {
     gsap.killTweensOf(groups);
     groups.forEach((group, index) => {
       if (index === nextStage) {
-        gsap.to(group, { autoAlpha: 1, y: 0, scale: 1, duration: immediate ? 0 : .46, ease: 'power3.out', overwrite: true });
+        gsap.to(group, { autoAlpha: 1, y: 0, scale: 1, duration: immediate ? 0 : .58, ease: 'power3.out', overwrite: true });
         const paths = Array.from(group.querySelectorAll('[data-operating-path]'));
         paths.forEach((path) => {
           const length = Number(path.dataset.operatingPathLength ?? 0);
-          if (length > 0) gsap.fromTo(path, { strokeDashoffset: length }, { strokeDashoffset: 0, duration: immediate ? 0 : .62, ease: 'power1.inOut', overwrite: true });
+          if (length > 0) gsap.fromTo(path, { strokeDashoffset: length }, { strokeDashoffset: 0, duration: immediate ? 0 : .78, ease: 'power1.inOut', overwrite: true });
         });
       } else {
         gsap.to(group, { autoAlpha: 0, y: index < nextStage ? -12 : 12, scale: .985, duration: immediate ? 0 : .28, ease: 'power2.out', overwrite: true });
