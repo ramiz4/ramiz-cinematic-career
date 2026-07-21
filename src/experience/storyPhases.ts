@@ -3,7 +3,7 @@ export const STORY_PHASES = [
   { id: 'system', navigationLabel: 'System', progressLabel: 'Decisions' },
   { id: 'journey', navigationLabel: 'Journey', progressLabel: 'Growth' },
   { id: 'impact', navigationLabel: 'Impact', progressLabel: 'Evidence' },
-  { id: 'leadership', navigationLabel: 'Leadership', progressLabel: 'Operating model' },
+  { id: 'leadership', navigationLabel: 'Leadership', progressLabel: 'Engineering system' },
   { id: 'contact', navigationLabel: 'Contact', progressLabel: 'Next' },
 ] as const;
 

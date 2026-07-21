@@ -49,26 +49,3 @@ export const leadershipJourney: LeadershipChapter[] = [
     signals: ['Technical direction', 'Architecture', 'Product engineering'],
   },
 ];
-
-export const operatingLoop = [
-  {
-    index: '01',
-    title: 'Strategy',
-    text: 'Translate business direction into explicit technical priorities and constraints.',
-  },
-  {
-    index: '02',
-    title: 'Boundaries',
-    text: 'Shape systems and ownership so the next correct decision becomes easier.',
-  },
-  {
-    index: '03',
-    title: 'Delivery',
-    text: 'Create fast feedback, reliable automation and a clear path to production.',
-  },
-  {
-    index: '04',
-    title: 'Learning',
-    text: 'Use operational evidence to improve the product, platform and engineering system.',
-  },
-] as const;

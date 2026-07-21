@@ -8,6 +8,7 @@ vi.mock('../components/StoryProgress', () => ({ StoryProgress: () => <div data-t
 vi.mock('../js/scrollytelling.js', () => ({ initSystemGraphScrollytelling: () => () => undefined }));
 vi.mock('../js/journey-scrollytelling.js', () => ({ initJourneyScrollytelling: () => () => undefined }));
 vi.mock('../js/impact-scrollytelling.js', () => ({ initImpactScrollytelling: () => () => undefined }));
+vi.mock('../js/operating-model-scrollytelling.js', () => ({ initOperatingModelScrollytelling: () => () => undefined }));
 
 describe('App', () => {
   beforeEach(() => window.sessionStorage.setItem(SITE_INTRO_SESSION_KEY, 'seen'));
@@ -19,13 +20,16 @@ describe('App', () => {
       'Scale the system. Then scale change.',
       'From shipping features to shaping the system.',
       'Decisions become product outcomes.',
-      'Leadership scales through clarity.',
+      'From verified intent to resilient production.',
       'Let’s turn complexity into leverage.',
     ]) expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument();
     expect(document.querySelectorAll('[data-story]')).toHaveLength(6);
     expect(document.querySelectorAll('[data-graph="ownership-zone"]')).toHaveLength(3);
     expect(document.querySelectorAll('[data-journey-step]')).toHaveLength(5);
     expect(document.querySelectorAll('[data-impact-stage]')).toHaveLength(12);
+    expect(document.querySelectorAll('[data-operating-step]')).toHaveLength(5);
+    expect(document.querySelectorAll('.operating-visual__principles > div')).toHaveLength(4);
+    expect(screen.getByText('GitHub Actions')).toBeInTheDocument();
     expect(screen.getByRole('main')).toHaveAttribute('tabindex', '-1');
   });
 

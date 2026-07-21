@@ -66,6 +66,9 @@ test('uses the static story artwork when reduced motion is requested', async ({ 
   await expect(page.getByRole('heading', { name: /technical complexity into business leverage/i })).toBeVisible();
   await expect(page.locator('[data-story]')).toHaveCount(6);
   await expect(page.locator('[data-system-story]')).toHaveAttribute('data-motion', 'reduced');
+  await expect(page.locator('[data-operating-story]')).toHaveAttribute('data-motion', 'reduced');
+  await expect(page.locator('[data-operating-story]')).toHaveAttribute('data-operating-stage', '5');
+  await expect(page.locator('[data-operating-group="deliver"]')).toHaveCSS('visibility', 'visible');
 });
 
 test('keeps every story chapter visible in a full-page mobile capture', async ({ page }, testInfo) => {
@@ -115,6 +118,34 @@ test('turns career scope and impact evidence into local scroll states', async ({
   });
   await expect(impactCase.locator('[data-impact-status]')).toHaveText('Decision');
   await expect(impactCase.locator('[data-impact-stage="decision"]')).toHaveClass(/is-active/);
+});
+
+test('moves verified intent through a dependency-aware engineering system', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Desktop sticky operating-system behavior');
+  await page.goto('./');
+  const story = page.locator('[data-operating-story]');
+  await expect(story).toHaveAttribute('data-motion', 'pinned');
+
+  const verify = page.locator('[data-operating-step="verify"]');
+  await verify.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await expect(verify).toHaveClass(/is-active/);
+  await expect(story).toHaveAttribute('data-operating-stage', '2');
+  await expect(page.locator('[data-operating-index]')).toHaveText('02 / 05');
+  await expect(page.locator('[data-operating-label]')).toHaveText('Human verified');
+
+  const parallelize = page.locator('[data-operating-step="parallelize"]');
+  await parallelize.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await expect(parallelize).toHaveClass(/is-active/);
+  await expect(story).toHaveAttribute('data-operating-stage', '4');
+  await expect(page.locator('[data-operating-group="parallelize"]')).toHaveCSS('visibility', 'visible');
+  await expect(page.locator('html')).toHaveAttribute('data-story-focus', 'leadership');
+  await expect(page.locator('.story-progress')).toHaveCSS('opacity', '0');
+
+  const deliver = page.locator('[data-operating-step="deliver"]');
+  await deliver.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await expect(deliver).toHaveClass(/is-active/);
+  await expect(story).toHaveAttribute('data-operating-stage', '5');
+  await expect(page.locator('[data-operating-group="deliver"]')).toHaveCSS('visibility', 'visible');
 });
 
 test('keeps mobile sections bounded when Safari expands the capture viewport', async ({ page }, testInfo) => {

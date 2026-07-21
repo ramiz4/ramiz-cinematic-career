@@ -258,52 +258,6 @@
 .impact-case__rail i { position: relative; grid-column: 1 / -1; height: 1px; overflow: hidden; background: rgba(117, 255, 187, .13); }
 .impact-case__rail b { position: absolute; inset: 0; display: block; background: var(--green); box-shadow: 0 0 .8rem var(--green); }
 
-.chapter--leadership { min-height: auto; padding-bottom: 12rem; }
-
-.operating-loop {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  max-width: 64rem;
-  margin-top: 5rem;
-  padding: 1px;
-  background: var(--line);
-}
-
-.operating-loop article {
-  min-height: 17rem;
-  padding: clamp(1.25rem, 3vw, 2.5rem);
-  background: rgba(4, 14, 9, .94);
-}
-
-.operating-loop article > span { color: var(--green); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .65rem; }
-.operating-loop h3 { margin: 4rem 0 .7rem; font-size: clamp(1.7rem, 3vw, 3rem); letter-spacing: -.045em; }
-.operating-loop article p { max-width: 28rem; margin: 0; color: var(--muted); line-height: 1.55; }
-
-.operating-loop__core {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  display: grid;
-  place-content: center;
-  width: 10rem;
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%) rotate(45deg);
-  border: 1px solid var(--green);
-  color: #031109;
-  background: var(--green);
-  box-shadow: 0 0 4rem rgba(54, 255, 157, .18);
-  text-align: center;
-}
-
-.operating-loop__core span,
-.operating-loop__core strong { transform: rotate(-45deg); }
-.operating-loop__core span { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .56rem; letter-spacing: .13em; text-transform: uppercase; }
-.operating-loop__core strong { margin-top: .3rem; font-size: 1.15rem; }
-
-.leadership-quote { margin-top: 8rem; }
-
 .contact-paths {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -365,12 +319,6 @@
   .impact-case__sequence div::before { left: .9rem; top: 1rem; }
   .impact-cases dt { padding-left: 1rem; }
   .impact-case__footer { align-items: flex-start; flex-direction: column; }
-
-  .operating-loop { grid-template-columns: 1fr; margin-top: 3rem; }
-  .operating-loop article { min-height: 13rem; }
-  .operating-loop h3 { margin-top: 2.7rem; }
-  .operating-loop__core { display: none; }
-  .leadership-quote { margin-top: 4rem; }
 
   .contact-paths { grid-template-columns: 1fr; }
   .contact-paths > a { min-height: 7.5rem; }

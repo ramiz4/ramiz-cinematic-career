@@ -92,8 +92,8 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
 
   const setSystemFocus = (focused) => {
     const documentElement = story.ownerDocument.documentElement;
-    if (focused) documentElement.dataset.systemFocus = 'true';
-    else delete documentElement.dataset.systemFocus;
+    if (focused) documentElement.dataset.storyFocus = 'system';
+    else if (documentElement.dataset.storyFocus === 'system') delete documentElement.dataset.storyFocus;
   };
 
   const media = gsap.matchMedia();

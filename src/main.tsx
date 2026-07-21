@@ -6,6 +6,7 @@ import './styles/global.css';
 import './styles/scrollytelling/system-transformation.css';
 import './styles/scrollytelling/leadership.css';
 import './styles/scrollytelling/site-intro.css';
+import './styles/scrollytelling/operating-model.css';
 
 const freezeMobileViewportHeight = () => {
   const viewportHeight = Math.round(window.visualViewport?.height ?? window.innerHeight);

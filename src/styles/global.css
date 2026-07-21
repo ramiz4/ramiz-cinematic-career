@@ -198,7 +198,8 @@ main:focus { outline: 0; }
   transition: opacity .25s ease;
 }
 
-html[data-system-focus="true"] .story-progress { opacity: 0; pointer-events: none; }
+html[data-story-focus] .story-progress,
+html[data-story-phase="leadership"] .story-progress { opacity: 0; pointer-events: none; }
 
 .story-progress__counter { color: var(--green); }
 .story-progress__track {
@@ -670,16 +671,6 @@ blockquote {
 }
 blockquote span { display: block; }
 blockquote em { font-style: normal; }
-.principles { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 5rem; background: var(--line); }
-.principles span {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  min-height: 5.2rem;
-  padding: 1rem 1.25rem;
-  background: rgba(5, 14, 9, .9);
-}
-.principles b { color: var(--green); font-family: ui-monospace, monospace; font-size: .68rem; }
 
 /* Final portal */
 .chapter--contact { min-height: 125svh; }
@@ -988,8 +979,6 @@ footer {
   .project-rail h3 { font-size: clamp(2.1rem, 11vw, 3.5rem); }
 
   blockquote { margin-top: 3rem; font-size: clamp(2.2rem, 10.8vw, 4rem); }
-  .principles { grid-template-columns: 1fr; margin-top: 3rem; }
-  .principles span { min-height: 4.2rem; }
 
   .chapter--contact { min-height: var(--app-viewport-height); }
   .terminal { padding: 1rem; backdrop-filter: none; }

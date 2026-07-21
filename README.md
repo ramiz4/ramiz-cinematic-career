@@ -20,15 +20,18 @@ The Vite development URL is
 ## Architecture
 
 - `src/chapters/` owns the narrative sections and accessible DOM structure.
-- `src/content/` contains the leadership story and impact evidence.
+- `src/content/` contains the leadership story, impact evidence and typed operating-system stages.
 - `src/js/` contains isolated GSAP/ScrollTrigger controllers for the system graph,
-  responsibility radius and impact stack.
+  Architecture Matrix intro, responsibility radius, impact stack and engineering operating system.
 - `src/styles/scrollytelling/` contains chapter-specific presentation layers.
 - `src/experience/` owns the ambient 3D scene and shared story-phase contract.
 
 Each controller exposes a pinned or sticky desktop sequence, a compact mobile
 sequence, and a static reduced-motion state. Animation is limited to transforms,
 opacity and SVG stroke properties to avoid layout work during scrolling.
+
+The Architecture Matrix runs once per browser session, can be replayed with
+`?intro=1`, and defers the ambient Three.js scene until the interface is ready.
 
 ## Quality gates
 
