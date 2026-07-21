@@ -47,15 +47,40 @@ test('keeps every story chapter visible in a full-page mobile capture', async ({
 test('scrubs the system graph through the five architecture decisions', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'mobile', 'Desktop pinned graph behavior');
   await page.goto('./');
+  await expect(page.locator('[data-system-story]')).toHaveAttribute('data-motion', 'pinned');
 
   const stage = page.locator('[data-system-scroll]');
   await stage.evaluate((element) => {
     const top = element.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({ top: top + element.scrollHeight * .9, behavior: 'auto' });
+    const range = element.scrollHeight - window.innerHeight;
+    window.scrollTo({ top: top + range * .94, behavior: 'auto' });
   });
 
   await expect(page.locator('[data-story-step="ownership"]')).toHaveClass(/is-active/);
-  await expect(page.locator('[data-system-story]')).toHaveAttribute('data-motion', 'pinned');
+  await expect(page.locator('[data-graph="ownership-zone"]').first()).toHaveCSS('visibility', 'visible');
+  await expect(page.locator('.story-progress')).toHaveCSS('opacity', '0');
+});
+
+test('turns career scope and impact evidence into local scroll states', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Desktop sticky narrative behavior');
+  await page.goto('./');
+  await expect(page.locator('[data-journey-story]')).toHaveAttribute('data-motion', 'tracked');
+  await expect(page.locator('[data-impact-story]')).toHaveAttribute('data-motion', 'stacked');
+
+  const journeyStep = page.locator('[data-journey-step]').nth(2);
+  await journeyStep.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await expect(journeyStep).toHaveClass(/is-active/);
+  await expect(page.locator('[data-journey-label]')).toHaveText('System coherence');
+
+  const impactCase = page.locator('[data-impact-case]').first();
+  await impactCase.evaluate((element) => {
+    const top = element.getBoundingClientRect().top + window.scrollY;
+    const start = top - 96;
+    const end = top + element.clientHeight - window.innerHeight + 64;
+    window.scrollTo({ top: start + (end - start) * .5, behavior: 'auto' });
+  });
+  await expect(impactCase.locator('[data-impact-status]')).toHaveText('Decision');
+  await expect(impactCase.locator('[data-impact-stage="decision"]')).toHaveClass(/is-active/);
 });
 
 test('keeps mobile sections bounded when Safari expands the capture viewport', async ({ page }, testInfo) => {

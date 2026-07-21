@@ -21,11 +21,12 @@ The Vite development URL is
 
 - `src/chapters/` owns the narrative sections and accessible DOM structure.
 - `src/content/` contains the leadership story and impact evidence.
-- `src/js/scrollytelling.js` owns the GSAP/ScrollTrigger system-graph timeline.
+- `src/js/` contains isolated GSAP/ScrollTrigger controllers for the system graph,
+  responsibility radius and impact stack.
 - `src/styles/scrollytelling/` contains chapter-specific presentation layers.
 - `src/experience/` owns the ambient 3D scene and shared story-phase contract.
 
-The architecture graph uses a pinned desktop sequence, a compact mobile
+Each controller exposes a pinned or sticky desktop sequence, a compact mobile
 sequence, and a static reduced-motion state. Animation is limited to transforms,
 opacity and SVG stroke properties to avoid layout work during scrolling.
 

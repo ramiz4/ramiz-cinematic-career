@@ -89,8 +89,10 @@ export function SystemTransformation() {
         <div className="system-visual" data-system-visual aria-hidden="true">
           <div className="system-visual__bar">
             <span>architecture.system</span>
+            <span className="system-visual__state"><i /><b data-system-step-index>01 / 05</b><em data-system-step-label>Constraint map</em></span>
             <strong>LIVE MODEL</strong>
           </div>
+          <div className="system-visual__scan" data-graph="scan" />
           <svg viewBox="0 0 820 620" role="presentation">
             <defs>
               <pattern id="system-grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -99,72 +101,93 @@ export function SystemTransformation() {
             </defs>
             <rect width="820" height="620" fill="url(#system-grid)" />
 
-            <g className="system-visual__connections">
-              <path data-graph="flow" d="M145 294 C195 294 205 160 276 160" />
-              <path data-graph="flow" d="M145 294 C220 294 238 294 316 294" />
-              <path data-graph="flow" d="M392 160 C438 160 454 160 495 160" />
-              <path data-graph="flow" d="M416 294 C468 294 472 294 536 294" />
-              <path data-graph="flow" d="M366 342 C366 384 366 402 366 434" />
-              <path data-graph="flow" d="M586 208 C586 338 554 402 474 458" />
-              <path data-graph="flow" d="M416 474 C486 474 534 392 576 342" />
-            </g>
+            <g data-graph-camera>
+              <g data-graph="ownership-zone" className="system-visual__ownership-zone">
+                <rect x="222" y="88" width="222" height="304" rx="24" /><text x="242" y="112">TEAM / PRODUCT</text>
+              </g>
+              <g data-graph="ownership-zone" className="system-visual__ownership-zone">
+                <rect x="466" y="88" width="232" height="304" rx="24" /><text x="486" y="112">TEAM / DOMAIN</text>
+              </g>
+              <g data-graph="ownership-zone" className="system-visual__ownership-zone">
+                <rect x="274" y="404" width="246" height="132" rx="24" /><text x="294" y="428">TEAM / PLATFORM</text>
+              </g>
 
-            <g data-graph="monolith" className="system-visual__monolith">
-              <rect x="244" y="115" width="332" height="350" rx="24" />
-              <path d="M244 174 H576" />
-              <circle cx="278" cy="145" r="6" /><circle cx="300" cy="145" r="6" /><circle cx="322" cy="145" r="6" />
-              <text x="360" y="151">CORE APPLICATION</text>
-              <rect x="280" y="208" width="260" height="52" rx="8" />
-              <rect x="280" y="282" width="260" height="52" rx="8" />
-              <rect x="280" y="356" width="260" height="72" rx="8" />
-              <text x="410" y="241">UI + WORKFLOWS</text>
-              <text x="410" y="315">DOMAIN LOGIC</text>
-              <text x="410" y="399">DATA + OPERATIONS</text>
-            </g>
+              <g className="system-visual__connections">
+                <path data-graph="flow" d="M166 294 C212 294 218 160 256 160" />
+                <path data-graph="flow" d="M166 294 H316" />
+                <path data-graph="flow" d="M392 160 H495" />
+                <path data-graph="flow" d="M416 294 H536" />
+                <path data-graph="flow" d="M586 208 V250" />
+                <path data-graph="flow" d="M366 342 V434" />
+                <path data-graph="flow" d="M594 342 C568 392 520 432 474 462" />
+              </g>
 
-            <g data-graph="warning" className="system-visual__warning">
-              <circle cx="226" cy="250" r="13" /><path d="M226 242 V251 M226 257 V259" />
-              <text x="74" y="255">COUPLED CHANGE</text>
-            </g>
-            <g data-graph="warning" className="system-visual__warning">
-              <circle cx="594" cy="335" r="13" /><path d="M594 327 V336 M594 342 V344" />
-              <text x="618" y="340">WIDE BLAST RADIUS</text>
-            </g>
-            <g data-graph="warning" className="system-visual__warning">
-              <circle cx="410" cy="487" r="13" /><path d="M410 479 V488 M410 494 V496" />
-              <text x="350" y="528">SLOW FEEDBACK</text>
-            </g>
+              <g className="system-visual__packets">
+                <circle data-graph="packet" r="5" />
+                <circle data-graph="packet" r="5" />
+                <circle data-graph="packet" r="5" />
+                <circle data-graph="packet" r="5" />
+              </g>
 
-            <g data-graph="service" className="system-visual__service">
-              <rect x="44" y="250" width="122" height="88" rx="14" /><text x="105" y="288">EDGE</text><text x="105" y="309">API</text>
-            </g>
-            <g data-graph="service" className="system-visual__service">
-              <rect x="256" y="116" width="136" height="88" rx="14" /><text x="324" y="154">IDENTITY</text><text x="324" y="175">DOMAIN</text>
-            </g>
-            <g data-graph="service" className="system-visual__service system-visual__service--primary">
-              <rect x="316" y="250" width="100" height="92" rx="14" /><text x="366" y="289">PRODUCT</text><text x="366" y="311">CORE</text>
-            </g>
-            <g data-graph="service" className="system-visual__service">
-              <rect x="495" y="116" width="182" height="92" rx="14" /><text x="586" y="155">WORKFLOW</text><text x="586" y="177">DOMAIN</text>
-            </g>
-            <g data-graph="service" className="system-visual__service">
-              <rect x="536" y="250" width="116" height="92" rx="14" /><text x="594" y="289">DATA</text><text x="594" y="311">PLANE</text>
-            </g>
-            <g data-graph="service" className="system-visual__service">
-              <rect x="306" y="434" width="168" height="82" rx="14" /><text x="390" y="470">OBSERVABILITY</text><text x="390" y="491">PLATFORM</text>
-            </g>
+              <g data-graph="monolith" className="system-visual__monolith">
+                <rect x="244" y="115" width="332" height="350" rx="24" />
+                <path d="M244 174 H576" />
+                <circle cx="278" cy="145" r="6" /><circle cx="300" cy="145" r="6" /><circle cx="322" cy="145" r="6" />
+                <text x="360" y="151">CORE APPLICATION</text>
+                <rect x="280" y="208" width="260" height="52" rx="8" />
+                <rect x="280" y="282" width="260" height="52" rx="8" />
+                <rect x="280" y="356" width="260" height="72" rx="8" />
+                <text x="410" y="241">UI + WORKFLOWS</text>
+                <text x="410" y="315">DOMAIN LOGIC</text>
+                <text x="410" y="399">DATA + OPERATIONS</text>
+              </g>
 
-            <g className="system-visual__pipeline">
-              <path data-graph="pipeline" d="M82 570 H738" />
-              <g data-graph="metric"><circle cx="120" cy="570" r="7" /><text x="120" y="597">COMMIT</text></g>
-              <g data-graph="metric"><circle cx="292" cy="570" r="7" /><text x="292" y="597">VERIFY</text></g>
-              <g data-graph="metric"><circle cx="472" cy="570" r="7" /><text x="472" y="597">DEPLOY</text></g>
-              <g data-graph="metric"><circle cx="662" cy="570" r="7" /><text x="662" y="597">LEARN</text></g>
-            </g>
+              <g data-graph="warning" className="system-visual__warning">
+                <circle cx="226" cy="250" r="13" /><path d="M226 242 V251 M226 257 V259" />
+                <text x="74" y="255">COUPLED CHANGE</text>
+              </g>
+              <g data-graph="warning" className="system-visual__warning">
+                <circle cx="594" cy="335" r="13" /><path d="M594 327 V336 M594 342 V344" />
+                <text x="618" y="340">WIDE BLAST RADIUS</text>
+              </g>
+              <g data-graph="warning" className="system-visual__warning system-visual__warning--centered">
+                <circle cx="410" cy="487" r="13" /><path d="M410 479 V488 M410 494 V496" />
+                <text x="410" y="528">SLOW FEEDBACK</text>
+              </g>
 
-            <g data-graph="team" className="system-visual__team"><circle cx="724" cy="104" r="31" /><text x="724" y="109">PRODUCT</text></g>
-            <g data-graph="team" className="system-visual__team"><circle cx="742" cy="404" r="31" /><text x="742" y="409">DOMAIN</text></g>
-            <g data-graph="team" className="system-visual__team"><circle cx="112" cy="438" r="31" /><text x="112" y="443">PLATFORM</text></g>
+              <g data-graph="service" className="system-visual__service">
+                <rect x="44" y="250" width="122" height="88" rx="14" /><text x="105" y="288">EDGE</text><text x="105" y="309">API</text>
+              </g>
+              <g data-graph="service" className="system-visual__service">
+                <rect x="256" y="116" width="136" height="88" rx="14" /><text x="324" y="154">IDENTITY</text><text x="324" y="175">DOMAIN</text>
+              </g>
+              <g data-graph="service" className="system-visual__service system-visual__service--primary">
+                <rect x="316" y="250" width="100" height="92" rx="14" /><text x="366" y="289">PRODUCT</text><text x="366" y="311">CORE</text>
+              </g>
+              <g data-graph="service" className="system-visual__service">
+                <rect x="495" y="116" width="182" height="92" rx="14" /><text x="586" y="155">WORKFLOW</text><text x="586" y="177">DOMAIN</text>
+              </g>
+              <g data-graph="service" className="system-visual__service">
+                <rect x="536" y="250" width="116" height="92" rx="14" /><text x="594" y="289">DATA</text><text x="594" y="311">PLANE</text>
+              </g>
+              <g data-graph="service" className="system-visual__service">
+                <rect x="306" y="434" width="168" height="82" rx="14" /><text x="390" y="470">OBSERVABILITY</text><text x="390" y="491">PLATFORM</text>
+              </g>
+
+              <g className="system-visual__pipeline">
+                <path data-graph="pipeline" d="M82 570 H738" />
+                <g data-graph="metric"><circle cx="120" cy="570" r="7" /><text x="120" y="597">COMMIT</text></g>
+                <g data-graph="metric"><circle cx="292" cy="570" r="7" /><text x="292" y="597">VERIFY</text></g>
+                <g data-graph="metric"><circle cx="472" cy="570" r="7" /><text x="472" y="597">DEPLOY</text></g>
+                <g data-graph="metric"><circle cx="662" cy="570" r="7" /><text x="662" y="597">LEARN</text></g>
+              </g>
+
+              <g data-graph="outcome" className="system-visual__outcome">
+                <rect x="548" y="430" width="178" height="78" rx="14" />
+                <text x="568" y="455">SYSTEM STATE</text>
+                <text x="568" y="482">SAFE AUTONOMY</text>
+              </g>
+            </g>
           </svg>
           <div className="system-visual__footer">
             <span>PRESSURE</span><span>BOUNDARIES</span><span>FLOW</span><span>DELIVERY</span><span>OWNERSHIP</span>

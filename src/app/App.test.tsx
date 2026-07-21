@@ -5,6 +5,8 @@ import { App } from './App';
 vi.mock('../experience/ExperienceLayer', () => ({ ExperienceLayer: () => <div data-testid="scene" /> }));
 vi.mock('../components/StoryProgress', () => ({ StoryProgress: () => <div data-testid="story-progress" /> }));
 vi.mock('../js/scrollytelling.js', () => ({ initSystemGraphScrollytelling: () => () => undefined }));
+vi.mock('../js/journey-scrollytelling.js', () => ({ initJourneyScrollytelling: () => () => undefined }));
+vi.mock('../js/impact-scrollytelling.js', () => ({ initImpactScrollytelling: () => () => undefined }));
 
 describe('App', () => {
   it('renders the complete story in an accessible document order', () => {
@@ -18,6 +20,9 @@ describe('App', () => {
       'Let’s turn complexity into leverage.',
     ]) expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument();
     expect(document.querySelectorAll('[data-story]')).toHaveLength(6);
+    expect(document.querySelectorAll('[data-graph="ownership-zone"]')).toHaveLength(3);
+    expect(document.querySelectorAll('[data-journey-step]')).toHaveLength(5);
+    expect(document.querySelectorAll('[data-impact-stage]')).toHaveLength(12);
     expect(screen.getByRole('main')).toHaveAttribute('tabindex', '-1');
   });
 

@@ -195,7 +195,10 @@ main:focus { outline: 0; }
   font-size: .66rem;
   letter-spacing: .12em;
   text-transform: uppercase;
+  transition: opacity .25s ease;
 }
+
+html[data-system-focus="true"] .story-progress { opacity: 0; pointer-events: none; }
 
 .story-progress__counter { color: var(--green); }
 .story-progress__track {
