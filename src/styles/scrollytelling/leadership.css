@@ -61,6 +61,7 @@
 }
 
 .leadership-timeline > li.is-active { border-color: rgba(117, 255, 187, .38); opacity: 1; transform: scale(1); }
+[data-enhancement="fallback"] .leadership-timeline > li { opacity: 1; transform: none; }
 
 .leadership-timeline__node {
   position: absolute;
@@ -185,6 +186,7 @@
 .impact-case__sequence div.is-active { opacity: 1; background: linear-gradient(160deg, rgba(54, 255, 157, .12), #030c08 58%); transform: none; }
 .impact-case__sequence div.is-active::before { background: var(--green); box-shadow: 0 0 1rem var(--green); }
 .impact-case__sequence div.is-active .impact-case__ghost { transform: translate(-50%, -50%) rotate(0); -webkit-text-stroke-color: rgba(117, 255, 187, .2); }
+[data-enhancement="fallback"] .impact-case__sequence div { opacity: 1; transform: none; }
 .impact-cases dt { color: var(--green); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .58rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .impact-cases dd { margin: .7rem 0 0; color: #c7ddd0; font-size: clamp(.82rem, 1vw, .98rem); line-height: 1.55; }
 .impact-case__footer { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--line); }

@@ -10,6 +10,12 @@ function resolveStory(root) {
   return root.querySelector?.(STORY_SELECTOR) ?? null;
 }
 
+function setStoryFocus(story, focused) {
+  const documentElement = story.ownerDocument.documentElement;
+  if (focused) documentElement.dataset.storyFocus = 'journey';
+  else if (documentElement.dataset.storyFocus === 'journey') delete documentElement.dataset.storyFocus;
+}
+
 export function initJourneyScrollytelling(root) {
   if (typeof globalThis.window === 'undefined') return () => {};
 
@@ -66,7 +72,18 @@ export function initJourneyScrollytelling(root) {
         onEnterBack: () => activate(index),
       }));
 
-      return () => triggers.forEach((trigger) => trigger.kill());
+      const focusTrigger = desktop ? ScrollTrigger.create({
+        trigger: story,
+        start: 'top 72%',
+        end: 'bottom 28%',
+        onToggle: ({ isActive }) => setStoryFocus(story, isActive),
+      }) : null;
+
+      return () => {
+        focusTrigger?.kill();
+        triggers.forEach((trigger) => trigger.kill());
+        setStoryFocus(story, false);
+      };
     },
     story,
   );
@@ -79,6 +96,7 @@ export function initJourneyScrollytelling(root) {
     if (!alive) return;
     alive = false;
     media.revert();
+    setStoryFocus(story, false);
     steps.forEach((step) => {
       step.classList.remove('is-active');
       step.removeAttribute('aria-current');

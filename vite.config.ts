@@ -28,13 +28,7 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: '/ramiz-cinematic-career/index.html',
-        globPatterns: ['**/*.{js,css,html,svg,png,webp}'],
-        globIgnores: ['**/Scene-*.js', '**/three.module-*.js'],
-        runtimeCaching: [{
-          urlPattern: /\/assets\/(?:Scene|three\.module)-.*\.js$/,
-          handler: 'CacheFirst',
-          options: { cacheName: 'cinematic-3d-story', expiration: { maxEntries: 3, maxAgeSeconds: 60 * 60 * 24 * 30 } }
-        }]
+        globPatterns: ['**/*.{js,css,html,svg,png,webp}']
       }
     })
   ],

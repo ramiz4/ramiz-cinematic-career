@@ -47,6 +47,15 @@ export function initOperatingModelScrollytelling(root) {
   let activeStage = -1;
   let alive = true;
 
+  const resetStageState = () => {
+    activeStage = -1;
+    gsap.killTweensOf(groups);
+    steps.forEach((step) => {
+      step.classList.remove('is-active');
+      step.removeAttribute('aria-current');
+    });
+  };
+
   const activateStage = (nextStage, immediate = false) => {
     if (nextStage === activeStage) return;
     activeStage = nextStage;
@@ -82,9 +91,11 @@ export function initOperatingModelScrollytelling(root) {
     {
       reduce: '(prefers-reduced-motion: reduce)',
       desktop: '(min-width: 801px)',
+      compact: '(max-width: 800px)',
     },
     (context) => {
       const { reduce, desktop } = context.conditions;
+      resetStageState();
       story.dataset.motion = reduce ? 'reduced' : desktop ? 'pinned' : 'compact';
 
       groups.forEach((group) => {
@@ -94,17 +105,9 @@ export function initOperatingModelScrollytelling(root) {
       if (progress) gsap.set(progress, { scaleX: 0, transformOrigin: 'left center' });
 
       if (reduce) {
-        steps.forEach((step) => step.classList.add('is-active'));
-        const finalGroup = groups.at(-1);
-        if (finalGroup) {
-          gsap.set(finalGroup, { autoAlpha: 1, y: 0, scale: 1 });
-          gsap.set(finalGroup.querySelectorAll('[data-operating-path]'), { strokeDashoffset: 0 });
-        }
-        story.dataset.operatingStage = String(steps.length);
-        if (indexLabel) indexLabel.textContent = '05 / 05';
-        if (statusLabel) statusLabel.textContent = steps.at(-1)?.dataset.operatingStatus ?? '';
+        activateStage(steps.length - 1, true);
         if (progress) gsap.set(progress, { scaleX: 1 });
-        return noop;
+        return resetStageState;
       }
 
       activateStage(0, true);
@@ -129,7 +132,10 @@ export function initOperatingModelScrollytelling(root) {
         },
       });
 
-      return () => setStoryFocus(story, false);
+      return () => {
+        resetStageState();
+        setStoryFocus(story, false);
+      };
     },
   );
 
@@ -139,10 +145,7 @@ export function initOperatingModelScrollytelling(root) {
     alive = false;
     media.revert();
     setStoryFocus(story, false);
-    steps.forEach((step) => {
-      step.classList.remove('is-active');
-      step.removeAttribute('aria-current');
-    });
+    resetStageState();
     delete story.dataset.motion;
     delete story.dataset.operatingStage;
     instances.delete(story);

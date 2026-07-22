@@ -11,34 +11,96 @@ export function Navigation() {
   const reduceMotion = useReducedMotion();
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const restoreFocusRef = useRef(false);
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setScrolled(latest > 24);
   });
 
   useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 800px)');
+    const closeBeyondMobile = () => {
+      if (mobileQuery.matches) return;
+      restoreFocusRef.current = false;
+      setOpen(false);
+    };
+    mobileQuery.addEventListener('change', closeBeyondMobile);
+    return () => mobileQuery.removeEventListener('change', closeBeyondMobile);
+  }, []);
+
+  useEffect(() => {
     const previousOverflow = document.body.style.overflow;
+    const backgroundElements = Array.from(document.querySelectorAll<HTMLElement>('[data-navigation-background]'));
     document.documentElement.classList.toggle('menu-open', open);
     document.body.style.overflow = open ? 'hidden' : previousOverflow;
-    if (open) requestAnimationFrame(() => firstLinkRef.current?.focus());
-    const closeWithEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setOpen(false);
+    backgroundElements.forEach((element) => {
+      if (open) {
+        element.setAttribute('inert', '');
+        element.setAttribute('aria-hidden', 'true');
+      } else {
+        element.removeAttribute('inert');
+        element.removeAttribute('aria-hidden');
+      }
+    });
+
+    const focusFrame = requestAnimationFrame(() => {
+      if (open) firstLinkRef.current?.focus();
+      else if (restoreFocusRef.current) {
+        restoreFocusRef.current = false;
         toggleRef.current?.focus();
       }
+    });
+
+    const handleDialogKeyboard = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && open) {
+        restoreFocusRef.current = true;
+        setOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab' || !open || !menuRef.current) return;
+      const focusable = Array.from(menuRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      )).filter((element) => !element.hasAttribute('inert'));
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
-    window.addEventListener('keydown', closeWithEscape);
+    window.addEventListener('keydown', handleDialogKeyboard);
     return () => {
+      cancelAnimationFrame(focusFrame);
       document.documentElement.classList.remove('menu-open');
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', closeWithEscape);
+      backgroundElements.forEach((element) => {
+        element.removeAttribute('inert');
+        element.removeAttribute('aria-hidden');
+      });
+      window.removeEventListener('keydown', handleDialogKeyboard);
     };
   }, [open]);
 
   const closeMenu = () => setOpen(false);
+  const closeMenuAndRestoreFocus = () => {
+    restoreFocusRef.current = true;
+    setOpen(false);
+  };
 
   return <>
-    <nav className={`nav ${scrolled ? 'nav--scrolled' : ''} ${open ? 'nav--open' : ''}`} aria-label="Primary">
+    <nav
+      className={`nav ${scrolled ? 'nav--scrolled' : ''} ${open ? 'nav--open' : ''}`}
+      aria-label="Primary"
+      inert={open ? true : undefined}
+      aria-hidden={open ? true : undefined}
+    >
       <a className="brand" href="#hero" aria-label="Back to the beginning" aria-current={active === 0 ? 'page' : undefined}>
         <span className="brand__mark"><b>RL</b><i /><i /></span>
         <span className="brand__word">Ramiz Loki</span>
@@ -69,7 +131,13 @@ export function Navigation() {
       <div className="nav__mobile-status" aria-hidden="true">
         <span><i /> Journey 0{active + 1}</span>
         <AnimatePresence mode="wait" initial={false}>
-          <motion.strong key={STORY_PHASES[active].id} initial={{ opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -7 }} transition={{ duration: .2 }}>
+          <motion.strong
+            key={STORY_PHASES[active].id}
+            initial={reduceMotion ? false : { opacity: 0, y: 7 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: -7 }}
+            transition={{ duration: reduceMotion ? 0 : .2 }}
+          >
             {STORY_PHASES[active].navigationLabel}
           </motion.strong>
         </AnimatePresence>
@@ -92,16 +160,20 @@ export function Navigation() {
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={menuRef}
           id="mobile-journey-menu"
           className="mobile-menu"
           role="dialog"
           aria-modal="true"
           aria-labelledby="mobile-menu-title"
-          initial={{ opacity: 0, clipPath: 'circle(0% at calc(100% - 2rem) 2rem)' }}
+          initial={reduceMotion ? false : { opacity: 0, clipPath: 'circle(0% at calc(100% - 2rem) 2rem)' }}
           animate={{ opacity: 1, clipPath: 'circle(145% at calc(100% - 2rem) 2rem)' }}
-          exit={{ opacity: 0, clipPath: 'circle(0% at calc(100% - 2rem) 2rem)' }}
-          transition={{ duration: .55, ease: [.16, 1, .3, 1] }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, clipPath: 'circle(0% at calc(100% - 2rem) 2rem)' }}
+          transition={{ duration: reduceMotion ? 0 : .55, ease: [.16, 1, .3, 1] }}
         >
+          <button className="mobile-menu__close" type="button" aria-label="Close journey menu" onClick={closeMenuAndRestoreFocus}>
+            <span /><span />
+          </button>
           <div className="mobile-menu__ambient" aria-hidden="true" />
           <div className="mobile-menu__header">
             <span>Navigate the system</span>
@@ -109,7 +181,12 @@ export function Navigation() {
           </div>
           <ol>
             {STORY_PHASES.map((phase, index) => (
-              <motion.li key={phase.id} initial={{ opacity: 0, x: 28 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: .08 + index * .045 }}>
+              <motion.li
+                key={phase.id}
+                initial={reduceMotion ? false : { opacity: 0, x: 28 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: reduceMotion ? 0 : .08 + index * .045 }}
+              >
                 <a ref={index === 0 ? firstLinkRef : undefined} href={`#${phase.id}`} onClick={closeMenu} aria-label={`${index + 1}. ${phase.navigationLabel}`} aria-current={index === active ? 'page' : undefined}>
                   <span>0{index + 1}</span><strong>{phase.navigationLabel}</strong><i aria-hidden="true">↘</i>
                 </a>

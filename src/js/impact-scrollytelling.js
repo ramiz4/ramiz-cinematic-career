@@ -11,6 +11,12 @@ function resolveStory(root) {
   return root.querySelector?.(STORY_SELECTOR) ?? null;
 }
 
+function setStoryFocus(story, focused) {
+  const documentElement = story.ownerDocument.documentElement;
+  if (focused) documentElement.dataset.storyFocus = 'impact';
+  else if (documentElement.dataset.storyFocus === 'impact') delete documentElement.dataset.storyFocus;
+}
+
 function activateStage(caseElement, nextStage, progress) {
   const progressLine = caseElement.querySelector('[data-impact-progress]');
   if (progressLine) gsap.set(progressLine, { scaleX: progress, transformOrigin: 'left center' });
@@ -61,6 +67,13 @@ export function initImpactScrollytelling(root) {
       cases.forEach((caseElement) => activateStage(caseElement, reduce ? 2 : 0, reduce ? 1 : 0));
       if (reduce) return () => {};
 
+      const focusTrigger = desktop ? ScrollTrigger.create({
+        trigger: story,
+        start: 'top 72%',
+        end: 'bottom 28%',
+        onToggle: ({ isActive }) => setStoryFocus(story, isActive),
+      }) : null;
+
       if (desktop) {
         const triggers = cases.map((caseElement) => {
           const card = caseElement.querySelector('[data-impact-card]');
@@ -80,7 +93,11 @@ export function initImpactScrollytelling(root) {
             },
           });
         });
-        return () => triggers.forEach((trigger) => trigger.kill());
+        return () => {
+          focusTrigger?.kill();
+          triggers.forEach((trigger) => trigger.kill());
+          setStoryFocus(story, false);
+        };
       }
 
       const triggers = cases.flatMap((caseElement) => {
@@ -93,7 +110,11 @@ export function initImpactScrollytelling(root) {
           onEnterBack: () => activateStage(caseElement, index, (index + 1) / stages.length),
         }));
       });
-      return () => triggers.forEach((trigger) => trigger.kill());
+      return () => {
+        focusTrigger?.kill();
+        triggers.forEach((trigger) => trigger.kill());
+        setStoryFocus(story, false);
+      };
     },
     story,
   );
@@ -106,6 +127,7 @@ export function initImpactScrollytelling(root) {
     if (!alive) return;
     alive = false;
     media.revert();
+    setStoryFocus(story, false);
     cases.forEach((caseElement) => {
       caseElement.classList.remove('is-active');
       caseElement.removeAttribute('data-impact-stage');

@@ -7,6 +7,7 @@ type SiteIntroProps = {
 
 export function SiteIntro({ onComplete }: SiteIntroProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const skipRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let disposed = false;
@@ -25,6 +26,7 @@ export function SiteIntro({ onComplete }: SiteIntroProps) {
     };
 
     const failSafe = window.setTimeout(complete, 7_000);
+    const focusFrame = window.requestAnimationFrame(() => skipRef.current?.focus());
 
     void import('../js/intro-scrollytelling.js')
       .then(({ initSiteIntro }) => {
@@ -36,19 +38,38 @@ export function SiteIntro({ onComplete }: SiteIntroProps) {
     return () => {
       disposed = true;
       window.clearTimeout(failSafe);
+      window.cancelAnimationFrame(focusFrame);
       cleanup();
     };
   }, [onComplete]);
 
+  useEffect(() => {
+    const containFocus = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      event.preventDefault();
+      skipRef.current?.focus();
+    };
+
+    window.addEventListener('keydown', containFocus);
+    return () => window.removeEventListener('keydown', containFocus);
+  }, []);
+
   return (
-    <div ref={rootRef} className="site-intro" data-site-intro role="status" aria-label="Initializing the three-dimensional engineering matrix">
+    <div
+      ref={rootRef}
+      className="site-intro"
+      data-site-intro
+      role="dialog"
+      aria-modal="true"
+      aria-label="Initializing the three-dimensional engineering matrix"
+    >
       <div className="site-intro__webgl" aria-hidden="true">
         <canvas data-intro-matrix />
       </div>
 
-      <div className="site-intro__topline" aria-hidden="true">
-        <span>RL / SPATIAL ENGINEERING SYSTEM</span>
-        <strong data-intro-status>INITIALIZING</strong>
+      <div className="site-intro__topline">
+        <span aria-hidden="true">RL / SPATIAL ENGINEERING SYSTEM</span>
+        <strong data-intro-status aria-live="polite">INITIALIZING</strong>
       </div>
 
       <div className="site-intro__matrix" aria-hidden="true">
@@ -63,7 +84,7 @@ export function SiteIntro({ onComplete }: SiteIntroProps) {
       <div className="site-intro__footer" aria-hidden="true">
         <span>Architecture</span><i /><span>Delivery</span><i /><span>Leadership</span><i /><span>Evidence</span>
       </div>
-      <button className="site-intro__skip" type="button" data-intro-skip>Skip intro</button>
+      <button ref={skipRef} className="site-intro__skip" type="button" data-intro-skip>Skip intro</button>
     </div>
   );
 }

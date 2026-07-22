@@ -16,6 +16,15 @@ test('assembles the interface once and keeps an immediate escape hatch', async (
   const hero = page.locator('.hero__sticky');
 
   await expect(intro).toBeVisible();
+  await expect(intro).toHaveAttribute('role', 'dialog');
+  await expect(intro).toHaveAttribute('aria-modal', 'true');
+  await expect(page.locator('[data-site-shell]')).toHaveAttribute('inert', '');
+  await expect(page.locator('[data-site-shell]')).toHaveAttribute('aria-hidden', 'true');
+  await expect(page.getByRole('button', { name: 'Skip intro' })).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('button', { name: 'Skip intro' })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.getByRole('button', { name: 'Skip intro' })).toBeFocused();
   await expect(matrix).toHaveAttribute('data-matrix-state', 'running');
   await expect(page.locator('.scene canvas')).toHaveCount(0);
   const before = await hero.boundingBox();
@@ -24,6 +33,9 @@ test('assembles the interface once and keeps an immediate escape hatch', async (
   await expect(intro).toHaveCount(0);
   await expect(matrix).toHaveCount(0);
   await expect(page.getByRole('heading', { name: /technical complexity into business leverage/i })).toBeVisible();
+  await expect(page.locator('[data-site-shell]')).not.toHaveAttribute('inert', '');
+  await expect(page.locator('[data-site-shell]')).not.toHaveAttribute('aria-hidden', 'true');
+  await expect(page.locator('#main')).toBeFocused();
   await expect(page.locator('.scene canvas')).toHaveCount(1);
   expect(await page.evaluate((key) => window.sessionStorage.getItem(key), SITE_INTRO_SESSION_KEY)).toBe('seen');
 
@@ -59,6 +71,49 @@ test('flies through on scroll intent and destroys the intro matrix before the he
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
 });
 
+test('keeps semantic content available when optional animation chunks fail', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'One enhancement fallback check is sufficient');
+  await page.route('**/assets/Scene-*.js', (route) => route.abort());
+  await page.route('**/assets/*scrollytelling-*.js', (route) => route.abort());
+  await page.goto('./');
+
+  await expect(page.getByTestId('static-scene')).toBeVisible();
+  for (const selector of [
+    '[data-system-story]',
+    '[data-journey-story]',
+    '[data-impact-story]',
+    '[data-operating-story]',
+  ]) await expect(page.locator(selector)).toHaveAttribute('data-enhancement', 'fallback');
+  for (const heading of await page.locator('main h2').all()) await expect(heading).toBeVisible();
+});
+
+test('reopens the complete experience offline after service-worker installation', async ({ page, context }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'One offline installation check is sufficient');
+  await page.goto('./');
+  await expect(page.locator('.scene canvas')).toHaveCount(1);
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+    if (navigator.serviceWorker.controller) return;
+    await new Promise<void>((resolve, reject) => {
+      const timeout = window.setTimeout(() => reject(new Error('Service worker did not claim the page')), 5_000);
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.clearTimeout(timeout);
+        resolve();
+      }, { once: true });
+    });
+  });
+
+  await context.setOffline(true);
+  try {
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: /technical complexity into business leverage/i })).toBeVisible();
+    await expect(page.locator('.scene canvas')).toHaveCount(1);
+    await expect(page.locator('[data-operating-story]')).toHaveAttribute('data-enhancement', 'ready');
+  } finally {
+    await context.setOffline(false);
+  }
+});
+
 test('tells the full scroll story without overflow or runtime errors', async ({ page }) => {
   const errors: string[] = [];
   page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
@@ -87,9 +142,80 @@ test('uses the static story artwork when reduced motion is requested', async ({ 
   await expect(page.getByRole('heading', { name: /technical complexity into business leverage/i })).toBeVisible();
   await expect(page.locator('[data-story]')).toHaveCount(6);
   await expect(page.locator('[data-system-story]')).toHaveAttribute('data-motion', 'reduced');
+  await expect(page.locator('[data-system-step-index]')).toHaveText('05 / 05');
+  await expect(page.locator('[data-system-step-label]')).toHaveText('Ownership aligned');
+  await expect(page.locator('[data-story-step].is-active')).toHaveCount(1);
+  await expect(page.locator('[data-story-step="ownership"]')).toHaveClass(/is-active/);
   await expect(page.locator('[data-operating-story]')).toHaveAttribute('data-motion', 'reduced');
   await expect(page.locator('[data-operating-story]')).toHaveAttribute('data-operating-stage', '5');
+  await expect(page.locator('[data-operating-step].is-active')).toHaveCount(1);
+  await expect(page.locator('[data-operating-step="deliver"]')).toHaveClass(/is-active/);
   await expect(page.locator('[data-operating-group="deliver"]')).toHaveCSS('visibility', 'visible');
+});
+
+test('reinitializes the operating model when motion preferences change at runtime', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Desktop motion preference lifecycle');
+  await page.goto('./');
+  const story = page.locator('[data-operating-story]');
+  await expect(story).toHaveAttribute('data-motion', 'pinned');
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(story).toHaveAttribute('data-motion', 'reduced');
+  await expect(story).toHaveAttribute('data-operating-stage', '5');
+  await expect(page.locator('[data-operating-step].is-active')).toHaveCount(1);
+  await expect(page.locator('[data-operating-step="deliver"]')).toHaveClass(/is-active/);
+
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect(story).toHaveAttribute('data-motion', 'pinned');
+  await expect(story).toHaveAttribute('data-operating-stage', '1');
+  await expect(page.locator('[data-operating-step].is-active')).toHaveCount(1);
+  await expect(page.locator('[data-operating-step="analyze"]')).toHaveClass(/is-active/);
+  await expect(page.locator('[data-operating-group="analyze"]')).toHaveCSS('visibility', 'visible');
+  await expect(page.locator('[data-operating-group="deliver"]')).toHaveCSS('visibility', 'hidden');
+});
+
+test('keeps mobile navigation and story progress accessible', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile navigation behavior');
+  await page.goto('./');
+
+  const storyProgress = page.getByRole('complementary', { name: 'Story progress' });
+  await expect(storyProgress.getByRole('link', { name: 'Position' })).toHaveAttribute('href', '#hero');
+  await expect(storyProgress.getByRole('link', { name: 'Engineering system' })).toHaveAttribute('href', '#leadership');
+
+  const toggle = page.getByRole('button', { name: 'Open journey menu' });
+  await toggle.click();
+  const dialog = page.getByRole('dialog', { name: 'Your journey' });
+  const closeButton = dialog.getByRole('button', { name: 'Close journey menu' });
+  const contactLink = dialog.getByRole('link', { name: 'Discuss a leadership mandate' });
+  await expect(dialog).toBeVisible();
+  await expect(page.locator('.nav')).toHaveAttribute('inert', '');
+  const backgroundLayers = page.locator('[data-navigation-background]');
+  await expect(backgroundLayers).toHaveCount(2);
+  for (const layer of await backgroundLayers.all()) await expect(layer).toHaveAttribute('inert', '');
+  await expect(dialog.getByRole('link', { name: '1. Position' })).toBeFocused();
+
+  await closeButton.focus();
+  await page.keyboard.press('Shift+Tab');
+  await expect(contactLink).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(closeButton).toBeFocused();
+  await closeButton.click();
+  await expect(dialog).toHaveCount(0);
+  await expect(toggle).toBeFocused();
+
+  await toggle.click();
+  await expect(page.getByRole('dialog', { name: 'Your journey' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Your journey' })).toHaveCount(0);
+  await expect(toggle).toBeFocused();
+
+  await toggle.click();
+  await expect(page.getByRole('dialog', { name: 'Your journey' })).toBeVisible();
+  await page.setViewportSize({ width: 844, height: 390 });
+  await expect(page.getByRole('dialog', { name: 'Your journey' })).toHaveCount(0);
+  await expect(page.locator('.nav')).not.toHaveAttribute('inert', '');
+  for (const layer of await backgroundLayers.all()) await expect(layer).not.toHaveAttribute('inert', '');
+  await expect(page.getByRole('main')).toBeVisible();
 });
 
 test('keeps every story chapter visible in a full-page mobile capture', async ({ page }, testInfo) => {
@@ -130,6 +256,8 @@ test('turns career scope and impact evidence into local scroll states', async ({
   await expect(journeyStep).toHaveClass(/is-active/);
   await expect(page.locator('[data-journey-story]')).toHaveAttribute('data-journey-stage', '3');
   await expect(page.locator('.journey-radar')).toHaveCount(0);
+  await expect(page.locator('html')).toHaveAttribute('data-story-focus', 'journey');
+  await expect(page.locator('.story-progress')).toHaveCSS('opacity', '0');
 
   const impactCase = page.locator('[data-impact-case]').first();
   await impactCase.evaluate((element) => {
@@ -140,6 +268,52 @@ test('turns career scope and impact evidence into local scroll states', async ({
   });
   await expect(impactCase.locator('[data-impact-status]')).toHaveText('Decision');
   await expect(impactCase.locator('[data-impact-stage="decision"]')).toHaveClass(/is-active/);
+  await expect(page.locator('html')).toHaveAttribute('data-story-focus', 'impact');
+  await expect(page.locator('.story-progress')).toHaveCSS('opacity', '0');
+});
+
+test('keeps compact journey navigation available outside pinned visualizations', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Compact story-rail behavior');
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('./');
+
+  for (const selector of ['[data-journey-story]', '[data-impact-story]']) {
+    const story = page.locator(selector);
+    await expect(story).toHaveAttribute('data-motion', 'compact');
+    await story.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await expect(page.locator('html')).not.toHaveAttribute('data-story-focus', /journey|impact/);
+    await expect(page.locator('.story-progress')).toHaveCSS('opacity', '1');
+    await expect(page.locator('.story-progress')).toHaveCSS('pointer-events', 'auto');
+  }
+});
+
+test('keeps the compact operating diagram visible and reversible on short mobile screens', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Small mobile operating-system behavior');
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('./');
+
+  const story = page.locator('[data-operating-story]');
+  const canvas = page.locator('.operating-visual__canvas');
+  await expect(story).toHaveAttribute('data-motion', 'compact');
+  await expect(story).toHaveAttribute('data-operating-stage', '1');
+  await expect(canvas).toBeVisible();
+  expect((await canvas.boundingBox())?.height ?? 0).toBeGreaterThan(120);
+  for (const title of await page.locator('.operating-visual__principles dt').all()) {
+    expect(parseFloat(await title.evaluate((element) => getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(12);
+  }
+  for (const meaning of await page.locator('.decision-filter__meaning').all()) {
+    expect(parseFloat(await meaning.evaluate((element) => getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(12);
+  }
+
+  const parallelize = page.locator('[data-operating-step="parallelize"]');
+  await parallelize.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await expect(story).toHaveAttribute('data-operating-stage', '4');
+  await expect(parallelize).toHaveClass(/is-active/);
+
+  const analyze = page.locator('[data-operating-step="analyze"]');
+  await analyze.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await expect(story).toHaveAttribute('data-operating-stage', '1');
+  await expect(analyze).toHaveClass(/is-active/);
 });
 
 test('keeps the WebGL world fixed and steers it around story interfaces', async ({ page }, testInfo) => {

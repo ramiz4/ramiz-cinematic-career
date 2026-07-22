@@ -416,6 +416,7 @@
 }
 
 [data-motion="reduced"] .system-story__beats li { opacity: 1; }
+[data-enhancement="fallback"] .system-story__beats li { opacity: 1; }
 
 @media (max-width: 1050px) {
   .system-story__header { grid-template-columns: minmax(6rem, 9rem) minmax(0, 1fr); gap: 2rem; }

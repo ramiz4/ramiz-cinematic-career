@@ -19,6 +19,11 @@ import { initGsapLayoutBridge } from '../js/gsap-layout-bridge.js';
 import { initThreeViewportController, updateThreeViewport } from '../js/three-viewport-controller.js';
 
 const LINK_COUNT = 28;
+const PHASE_OPACITY = [.07, .24, .14, .09, .22, .18] as const;
+const DESKTOP_X = [2.2, 1.6, 2.2, 1.8, 2.2, 1.7] as const;
+const COMPACT_X = [1.7, .7, .75, .7, .72, .62] as const;
+const COMPACT_Y = [2.55, .95, .95, .95, .95, .95] as const;
+const COMPACT_SCALE = [.45, .72, .72, .72, .72, .72] as const;
 
 type SceneProps = { compact?: boolean };
 
@@ -122,6 +127,12 @@ function EngineeringEngine({ compact = false }: SceneProps) {
   const anchors = useStoryAnchors();
   const layouts = useMemo(() => createLayouts(count), [count]);
   const currentPositions = useMemo(() => Array.from({ length: count }, () => new Vector3()), [count]);
+  const instanceMotion = useMemo(() => Array.from({ length: count }, (_, index) => ({
+    rotationX: seeded(index, 11) * Math.PI,
+    rotationY: seeded(index, 12) * Math.PI,
+    rotationZ: seeded(index, 13) * Math.PI,
+    pulse: .72 + seeded(index, 14) * .7,
+  })), [count]);
   const dummy = useMemo(() => new Object3D(), []);
   const mixedPosition = useMemo(() => new Vector3(), []);
 
@@ -167,15 +178,16 @@ function EngineeringEngine({ compact = false }: SceneProps) {
     const elapsed = clock.elapsedTime;
 
     for (let index = 0; index < count; index += 1) {
+      const motion = instanceMotion[index];
       mixedPosition.lerpVectors(layouts[fromIndex][index], layouts[toIndex][index], mix);
       currentPositions[index].copy(mixedPosition);
       dummy.position.copy(mixedPosition);
       dummy.rotation.set(
-        seeded(index, 11) * Math.PI + elapsed * .08,
-        seeded(index, 12) * Math.PI + elapsed * .12,
-        seeded(index, 13) * Math.PI,
+        motion.rotationX + elapsed * .08,
+        motion.rotationY + elapsed * .12,
+        motion.rotationZ,
       );
-      const pulse = .72 + seeded(index, 14) * .7 + Math.sin(elapsed * 1.4 + index) * .08;
+      const pulse = motion.pulse + Math.sin(elapsed * 1.4 + index) * .08;
       dummy.scale.setScalar(pulse);
       dummy.updateMatrix();
       fragments.setMatrixAt(index, dummy.matrix);
@@ -191,20 +203,21 @@ function EngineeringEngine({ compact = false }: SceneProps) {
     }
     if (lineAttribute) lineAttribute.needsUpdate = true;
     if (linksMaterialRef.current) {
-      const phaseOpacity = [.07, .24, .14, .09, .22, .18];
       linksMaterialRef.current.opacity = MathUtils.lerp(
-        phaseOpacity[fromIndex],
-        phaseOpacity[toIndex],
+        PHASE_OPACITY[fromIndex],
+        PHASE_OPACITY[toIndex],
         mix,
       );
     }
 
-    const desktopX = [2.2, 1.6, 2.2, 1.8, 2.2, 1.7];
-    const targetX = compact ? 0 : MathUtils.lerp(desktopX[fromIndex], desktopX[toIndex], mix);
-    const targetY = compact ? .95 : 0;
+    const targetX = compact
+      ? MathUtils.lerp(COMPACT_X[fromIndex], COMPACT_X[toIndex], mix)
+      : MathUtils.lerp(DESKTOP_X[fromIndex], DESKTOP_X[toIndex], mix);
+    const targetY = compact ? MathUtils.lerp(COMPACT_Y[fromIndex], COMPACT_Y[toIndex], mix) : 0;
+    const targetScale = compact ? MathUtils.lerp(COMPACT_SCALE[fromIndex], COMPACT_SCALE[toIndex], mix) : 1;
     world.position.x = MathUtils.damp(world.position.x, targetX, 3.5, delta);
     world.position.y = MathUtils.damp(world.position.y, targetY, 3.5, delta);
-    world.scale.setScalar(MathUtils.damp(world.scale.x, compact ? .72 : 1, 4, delta));
+    world.scale.setScalar(MathUtils.damp(world.scale.x, targetScale, 4, delta));
     world.rotation.y = elapsed * .035 + position * .17;
     world.rotation.x = Math.sin(elapsed * .2) * .035;
 

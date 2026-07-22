@@ -1,26 +1,14 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Chapter } from '../components/Chapter';
 import { leadershipJourney } from '../content/leadership';
+import { useProgressiveEnhancement } from '../hooks/useProgressiveEnhancement';
+
+const loadJourneyEnhancement = () => import('../js/journey-scrollytelling.js')
+  .then(({ initJourneyScrollytelling }) => initJourneyScrollytelling);
 
 export function LeadershipJourney() {
   const rootRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root) return undefined;
-
-    let disposed = false;
-    let cleanup: (() => void) | undefined;
-
-    void import('../js/journey-scrollytelling.js').then(({ initJourneyScrollytelling }) => {
-      if (!disposed) cleanup = initJourneyScrollytelling(root);
-    });
-
-    return () => {
-      disposed = true;
-      cleanup?.();
-    };
-  }, []);
+  useProgressiveEnhancement(rootRef, loadJourneyEnhancement);
 
   return (
     <Chapter id="journey" index="02" eyebrow="The scope keeps expanding" title="From shipping features to shaping the system.">

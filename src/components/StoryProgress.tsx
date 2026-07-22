@@ -15,7 +15,11 @@ export function StoryProgress() {
       <ol>
         {STORY_PHASES.map((phase, index) => (
           <li key={phase.id} className={index === active ? 'is-active' : ''}>
-            <a href={`#${phase.id}`} aria-current={index === active ? 'step' : undefined}>
+            <a
+              href={`#${phase.id}`}
+              aria-label={phase.progressLabel}
+              aria-current={index === active ? 'step' : undefined}
+            >
               <i aria-hidden="true" />
               <span>{phase.progressLabel}</span>
             </a>

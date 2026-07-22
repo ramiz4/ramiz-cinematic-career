@@ -1,4 +1,8 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useRef } from 'react';
+import { useProgressiveEnhancement } from '../hooks/useProgressiveEnhancement';
+
+const loadSystemEnhancement = () => import('../js/scrollytelling.js')
+  .then(({ initSystemGraphScrollytelling }) => initSystemGraphScrollytelling);
 
 const storyBeats = [
   {
@@ -84,23 +88,7 @@ function ConstraintSignal({
 
 export function SystemTransformation() {
   const rootRef = useRef<HTMLElement>(null);
-
-  useLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root) return undefined;
-
-    let disposed = false;
-    let cleanup: (() => void) | undefined;
-
-    void import('../js/scrollytelling.js').then(({ initSystemGraphScrollytelling }) => {
-      if (!disposed) cleanup = initSystemGraphScrollytelling(root);
-    });
-
-    return () => {
-      disposed = true;
-      cleanup?.();
-    };
-  }, []);
+  useProgressiveEnhancement(rootRef, loadSystemEnhancement);
 
   return (
     <section ref={rootRef} id="system" data-story="system" data-system-story className="system-story" aria-labelledby="system-title">

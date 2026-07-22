@@ -1,24 +1,15 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Chapter } from '../components/Chapter';
 import { EngineeringOperatingVisual } from '../components/EngineeringOperatingVisual';
 import { operatingStages } from '../content/operatingModel';
+import { useProgressiveEnhancement } from '../hooks/useProgressiveEnhancement';
+
+const loadOperatingModelEnhancement = () => import('../js/operating-model-scrollytelling.js')
+  .then(({ initOperatingModelScrollytelling }) => initOperatingModelScrollytelling);
 
 export function OperatingModel() {
   const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let disposed = false;
-    let cleanup: () => void = () => undefined;
-
-    void import('../js/operating-model-scrollytelling.js').then(({ initOperatingModelScrollytelling }) => {
-      if (!disposed && rootRef.current) cleanup = initOperatingModelScrollytelling(rootRef.current);
-    });
-
-    return () => {
-      disposed = true;
-      cleanup();
-    };
-  }, []);
+  useProgressiveEnhancement(rootRef, loadOperatingModelEnhancement);
 
   return (
     <Chapter id="leadership" index="04" eyebrow="Engineering is a delivery system" title="From verified intent to resilient production.">

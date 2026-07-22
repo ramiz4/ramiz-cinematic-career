@@ -1,26 +1,14 @@
-import { useLayoutEffect, useRef, type CSSProperties } from 'react';
+import { useRef, type CSSProperties } from 'react';
 import { Chapter } from '../components/Chapter';
 import { impactCases } from '../content/impact';
+import { useProgressiveEnhancement } from '../hooks/useProgressiveEnhancement';
+
+const loadImpactEnhancement = () => import('../js/impact-scrollytelling.js')
+  .then(({ initImpactScrollytelling }) => initImpactScrollytelling);
 
 export function Impact() {
   const rootRef = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root) return undefined;
-
-    let disposed = false;
-    let cleanup: (() => void) | undefined;
-
-    void import('../js/impact-scrollytelling.js').then(({ initImpactScrollytelling }) => {
-      if (!disposed) cleanup = initImpactScrollytelling(root);
-    });
-
-    return () => {
-      disposed = true;
-      cleanup?.();
-    };
-  }, []);
+  useProgressiveEnhancement(rootRef, loadImpactEnhancement);
 
   return (
     <Chapter id="impact" index="03" eyebrow="The work is the evidence" title="Decisions become product outcomes.">

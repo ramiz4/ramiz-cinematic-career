@@ -206,52 +206,69 @@ function damp(current, target, smoothing, delta) {
   return current + (target - current) * (1 - Math.exp(-smoothing * delta));
 }
 
+function createMatrixResources(canvas, compact) {
+  let renderer;
+  let atlasTexture;
+  let geometry;
+  let material;
+
+  try {
+    const atlas = createGlyphAtlas();
+    atlasTexture = atlas.texture;
+    geometry = createGlyphField(compact);
+    renderer = new WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: true,
+      powerPreference: 'high-performance',
+    });
+    renderer.setClearColor(0x000000, 0);
+
+    const context = renderer.getContext();
+    const pointSizeRange = context.getParameter(context.ALIASED_POINT_SIZE_RANGE);
+    material = new ShaderMaterial({
+      uniforms: {
+        uAtlas: { value: atlasTexture },
+        uAtlasColumns: { value: ATLAS_COLUMNS },
+        uAtlasRows: { value: atlas.rows },
+        uGlyphCount: { value: GLYPHS.length },
+        uTime: { value: 0 },
+        uCycleHeight: { value: FIELD_HEIGHT },
+        uPixelRatio: { value: 1 },
+        uMaxPointSize: { value: Math.min(pointSizeRange[1], compact ? 30 : 42) },
+      },
+      vertexShader: VERTEX_SHADER,
+      fragmentShader: FRAGMENT_SHADER,
+      transparent: true,
+      depthTest: true,
+      depthWrite: false,
+      blending: AdditiveBlending,
+    });
+
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(52, 1, 0.1, 90);
+    camera.position.set(0, 0, CAMERA_Z);
+    const field = new Points(geometry, material);
+    field.frustumCulled = false;
+    scene.add(field);
+
+    return { renderer, atlasTexture, geometry, material, scene, camera };
+  } catch (error) {
+    material?.dispose();
+    geometry?.dispose();
+    atlasTexture?.dispose();
+    renderer?.dispose();
+    throw error;
+  }
+}
+
 function createMatrixInstance({ canvas, compact }) {
-  const renderer = new WebGLRenderer({
-    canvas,
-    alpha: true,
-    antialias: true,
-    powerPreference: 'high-performance',
-  });
-  renderer.setClearColor(0x000000, 0);
-
-  const scene = new Scene();
-  const camera = new PerspectiveCamera(52, 1, 0.1, 90);
-  camera.position.set(0, 0, CAMERA_Z);
-
-  const { texture: atlasTexture, rows: atlasRows } = createGlyphAtlas();
-  const geometry = createGlyphField(compact);
-  const pointSizeRange = renderer.getContext().getParameter(
-    renderer.getContext().ALIASED_POINT_SIZE_RANGE,
-  );
-  const material = new ShaderMaterial({
-    uniforms: {
-      uAtlas: { value: atlasTexture },
-      uAtlasColumns: { value: ATLAS_COLUMNS },
-      uAtlasRows: { value: atlasRows },
-      uGlyphCount: { value: GLYPHS.length },
-      uTime: { value: 0 },
-      uCycleHeight: { value: FIELD_HEIGHT },
-      uPixelRatio: { value: 1 },
-      uMaxPointSize: { value: Math.min(pointSizeRange[1], compact ? 30 : 42) },
-    },
-    vertexShader: VERTEX_SHADER,
-    fragmentShader: FRAGMENT_SHADER,
-    transparent: true,
-    depthTest: true,
-    depthWrite: false,
-    blending: AdditiveBlending,
-  });
-  const field = new Points(geometry, material);
-  field.frustumCulled = false;
-  scene.add(field);
+  const { renderer, atlasTexture, geometry, material, scene, camera } = createMatrixResources(canvas, compact);
 
   const pointerTarget = { x: 0, y: 0 };
   const pointer = { x: 0, y: 0 };
   const container = canvas.parentElement ?? canvas;
-  const resizeObserver = typeof globalThis.ResizeObserver === 'function'
-    ? new globalThis.ResizeObserver(resize)
-    : null;
+  let resizeObserver = null;
   let frameId = 0;
   let lastFrameTime = 0;
   let elapsedTime = 0;
@@ -332,14 +349,22 @@ function createMatrixInstance({ canvas, compact }) {
     delete canvas.dataset.matrixState;
   }
 
-  resizeObserver?.observe(container);
-  globalThis.addEventListener('pointermove', onPointerMove, { passive: true });
-  globalThis.addEventListener('pointerleave', resetPointer, { passive: true });
-  globalThis.addEventListener('resize', resize, { passive: true });
-  globalThis.document.addEventListener('visibilitychange', onVisibilityChange);
-  resize();
-  canvas.dataset.matrixState = 'running';
-  requestFrame();
+  try {
+    resizeObserver = typeof globalThis.ResizeObserver === 'function'
+      ? new globalThis.ResizeObserver(resize)
+      : null;
+    resizeObserver?.observe(container);
+    globalThis.addEventListener('pointermove', onPointerMove, { passive: true });
+    globalThis.addEventListener('pointerleave', resetPointer, { passive: true });
+    globalThis.addEventListener('resize', resize, { passive: true });
+    globalThis.document.addEventListener('visibilitychange', onVisibilityChange);
+    resize();
+    canvas.dataset.matrixState = 'running';
+    requestFrame();
+  } catch (error) {
+    destroyInstance();
+    throw error;
+  }
 
   return {
     camera,
