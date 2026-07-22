@@ -20,7 +20,8 @@ function prepareDrawPath(path) {
 
 function setStoryFocus(story, focused) {
   const documentElement = story.ownerDocument.documentElement;
-  if (focused) documentElement.dataset.storyFocus = 'leadership';
+  const desktop = story.ownerDocument.defaultView?.matchMedia('(min-width: 801px)').matches;
+  if (focused && desktop) documentElement.dataset.storyFocus = 'leadership';
   else if (documentElement.dataset.storyFocus === 'leadership') delete documentElement.dataset.storyFocus;
 }
 
@@ -122,17 +123,25 @@ export function initOperatingModelScrollytelling(root) {
         });
       });
 
-      ScrollTrigger.create({
+      const focusTrigger = desktop ? ScrollTrigger.create({
         trigger: story,
-        start: desktop ? 'top top' : 'top 72%',
+        start: 'top top',
         end: 'bottom top',
         onToggle: ({ isActive }) => setStoryFocus(story, isActive),
+        onUpdate: ({ progress: normalizedProgress }) => {
+          if (progress) gsap.set(progress, { scaleX: normalizedProgress });
+        },
+      }) : ScrollTrigger.create({
+        trigger: story,
+        start: 'top bottom',
+        end: 'bottom top',
         onUpdate: ({ progress: normalizedProgress }) => {
           if (progress) gsap.set(progress, { scaleX: normalizedProgress });
         },
       });
 
       return () => {
+        focusTrigger.kill();
         resetStageState();
         setStoryFocus(story, false);
       };

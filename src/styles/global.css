@@ -1034,6 +1034,7 @@ footer {
     border: 0;
   }
   .story-progress__mobile-label { display: block; min-width: 3.8rem; color: #d8eee1; text-align: right; }
+  html[data-story-focus]:not(.menu-open) .story-progress { opacity: 1; pointer-events: auto; }
 
   .install-prompt {
     bottom: calc(4.25rem + env(safe-area-inset-bottom));
