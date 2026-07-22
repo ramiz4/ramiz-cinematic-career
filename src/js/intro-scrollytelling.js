@@ -3,6 +3,8 @@ import { destroy, getCamera, initMatrix } from './matrix3d.js';
 
 const instances = new WeakMap();
 const noop = () => {};
+const FLY_THROUGH_DELAY = 3;
+const FLY_THROUGH_AT = 1 + FLY_THROUGH_DELAY;
 
 export function initSiteIntro(root, { onComplete = noop } = {}) {
   if (!root || typeof globalThis.window === 'undefined') return noop;
@@ -48,17 +50,17 @@ export function initSiteIntro(root, { onComplete = noop } = {}) {
       if (depth) depth.textContent = 'SPATIAL FIELD / LIVE';
     }, [], .48)
     .call(() => { if (status) status.textContent = 'SYSTEM READY'; }, [], .94)
-    .addLabel('flyThrough', 1)
-    .to(hud, { autoAlpha: 0, scale: 1.08, duration: .3, ease: 'power2.in' }, 1)
-    .to(interfaceTargets, { autoAlpha: 1, y: 0, duration: .46, stagger: .035 }, 1.23)
-    .to(heroTargets, { autoAlpha: 1, y: 0, duration: .52, stagger: .045 }, 1.25)
-    .to(root, { clipPath: 'inset(0 0 100% 0)', duration: .5, ease: 'power3.inOut' }, 1.42)
+    .addLabel('flyThrough', FLY_THROUGH_AT)
+    .to(hud, { autoAlpha: 0, scale: 1.08, duration: .3, ease: 'power2.in' }, FLY_THROUGH_AT)
+    .to(interfaceTargets, { autoAlpha: 1, y: 0, duration: .46, stagger: .035 }, FLY_THROUGH_AT + .23)
+    .to(heroTargets, { autoAlpha: 1, y: 0, duration: .52, stagger: .045 }, FLY_THROUGH_AT + .25)
+    .to(root, { clipPath: 'inset(0 0 100% 0)', duration: .5, ease: 'power3.inOut' }, FLY_THROUGH_AT + .42)
     .call(complete);
 
   if (camera) {
     timeline
       .to(camera.position, { z: 7, duration: .72, ease: 'power1.inOut' }, .22)
-      .to(camera.position, { z: compact ? -12 : -21, duration: .68, ease: 'power3.in' }, 1);
+      .to(camera.position, { z: compact ? -12 : -21, duration: .68, ease: 'power3.in' }, FLY_THROUGH_AT);
   }
 
   if (compact) timeline.timeScale(1.4);

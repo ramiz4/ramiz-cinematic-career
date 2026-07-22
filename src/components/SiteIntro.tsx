@@ -24,7 +24,7 @@ export function SiteIntro({ onComplete }: SiteIntroProps) {
       onComplete();
     };
 
-    const failSafe = window.setTimeout(complete, 3_200);
+    const failSafe = window.setTimeout(complete, 7_000);
 
     void import('../js/intro-scrollytelling.js')
       .then(({ initSiteIntro }) => {
