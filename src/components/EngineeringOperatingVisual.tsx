@@ -2,7 +2,7 @@ import { decisionFilters } from '../content/operatingModel';
 
 export function EngineeringOperatingVisual() {
   return (
-    <aside className="operating-visual" data-operating-visual aria-label="Engineering operating system live model">
+    <aside className="operating-visual" data-operating-visual aria-label="Engineering operating system and decision filters">
       <header className="operating-visual__header">
         <span>engineering.os</span>
         <div><strong data-operating-index>01 / 05</strong><em data-operating-label>Evidence model</em></div>

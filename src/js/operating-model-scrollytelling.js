@@ -46,6 +46,7 @@ export function initOperatingModelScrollytelling(root) {
   if (!visual || steps.length === 0 || groups.length !== steps.length) return noop;
 
   let activeStage = -1;
+  let animateVisual = true;
   let alive = true;
 
   const resetStageState = () => {
@@ -72,6 +73,8 @@ export function initOperatingModelScrollytelling(root) {
     if (indexLabel) indexLabel.textContent = `${steps[nextStage].dataset.operatingNumber} / 05`;
     if (statusLabel) statusLabel.textContent = steps[nextStage].dataset.operatingStatus ?? '';
 
+    if (!animateVisual) return;
+
     gsap.killTweensOf(groups);
     groups.forEach((group, index) => {
       if (index === nextStage) {
@@ -97,7 +100,26 @@ export function initOperatingModelScrollytelling(root) {
     (context) => {
       const { reduce, desktop } = context.conditions;
       resetStageState();
+      animateVisual = desktop;
       story.dataset.motion = reduce ? 'reduced' : desktop ? 'pinned' : 'compact';
+
+      if (!desktop) {
+        activateStage(reduce ? steps.length - 1 : 0, true);
+
+        const compactStepTriggers = reduce ? [] : steps.map((step, index) => ScrollTrigger.create({
+          trigger: step,
+          start: 'top 72%',
+          end: 'bottom 38%',
+          onEnter: () => activateStage(index),
+          onEnterBack: () => activateStage(index),
+        }));
+
+        return () => {
+          compactStepTriggers.forEach((trigger) => trigger.kill());
+          resetStageState();
+          setStoryFocus(story, false);
+        };
+      }
 
       groups.forEach((group) => {
         gsap.set(group, { autoAlpha: 0, y: 12, scale: .985, transformOrigin: 'center center', transformBox: 'view-box' });
@@ -113,17 +135,17 @@ export function initOperatingModelScrollytelling(root) {
 
       activateStage(0, true);
 
-      steps.forEach((step, index) => {
-        ScrollTrigger.create({
+      const stepTriggers = steps.map((step, index) => {
+        return ScrollTrigger.create({
           trigger: step,
-          start: desktop ? 'top 58%' : 'top 72%',
-          end: desktop ? 'bottom 42%' : 'bottom 38%',
+          start: 'top 58%',
+          end: 'bottom 42%',
           onEnter: () => activateStage(index),
           onEnterBack: () => activateStage(index),
         });
       });
 
-      const focusTrigger = desktop ? ScrollTrigger.create({
+      const focusTrigger = ScrollTrigger.create({
         trigger: story,
         start: 'top top',
         end: 'bottom top',
@@ -131,17 +153,11 @@ export function initOperatingModelScrollytelling(root) {
         onUpdate: ({ progress: normalizedProgress }) => {
           if (progress) gsap.set(progress, { scaleX: normalizedProgress });
         },
-      }) : ScrollTrigger.create({
-        trigger: story,
-        start: 'top bottom',
-        end: 'bottom top',
-        onUpdate: ({ progress: normalizedProgress }) => {
-          if (progress) gsap.set(progress, { scaleX: normalizedProgress });
-        },
       });
 
       return () => {
         focusTrigger.kill();
+        stepTriggers.forEach((trigger) => trigger.kill());
         resetStageState();
         setStoryFocus(story, false);
       };

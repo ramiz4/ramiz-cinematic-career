@@ -292,83 +292,88 @@ test('keeps compact journey navigation available outside pinned visualizations',
   }
 });
 
-test('keeps compact system snapshots out of the story text flow', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile', 'Small mobile snapshot behavior');
+test('prioritizes mobile story copy over dense system diagrams', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Small mobile story-first behavior');
   for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }]) {
     await page.setViewportSize(viewport);
     await page.goto('./');
 
-    for (const [visualSelector, flowSelector] of [
-      ['[data-system-visual]', '.system-story__beats'],
-      ['[data-operating-visual]', '.operating-system__steps'],
-    ] as const) {
-      const visual = page.locator(visualSelector);
-      await expect(visual).toHaveCSS('position', 'relative');
-      const documentGap = await page.evaluate(({ visualSelector, flowSelector }) => {
-        const visualElement = document.querySelector(visualSelector);
-        const flowElement = document.querySelector(flowSelector);
-        if (!visualElement || !flowElement) return -1;
-        const visualRect = visualElement.getBoundingClientRect();
-        const flowRect = flowElement.getBoundingClientRect();
-        return flowRect.top - visualRect.bottom;
-      }, { visualSelector, flowSelector });
-      expect(documentGap, `${visualSelector} needs editorial breathing room`).toBeGreaterThanOrEqual(32);
-    }
+    await expect(page.locator('[data-system-visual]')).toHaveCSS('display', 'none');
+    await expect(page.locator('.operating-visual__header')).toHaveCSS('display', 'none');
+    await expect(page.locator('.operating-visual__canvas')).toHaveCSS('display', 'none');
+    await expect(page.locator('.operating-visual__rail')).toHaveCSS('display', 'none');
+    await expect(page.locator('.decision-console')).toBeVisible();
+    await expect(page.locator('[data-system-story] .pin-spacer')).toHaveCount(0);
+    await expect(page.locator('[data-operating-story] .pin-spacer')).toHaveCount(0);
 
     const pressure = page.locator('[data-story-step="pressure"]');
     const ownership = page.locator('[data-story-step="ownership"]');
-    await pressure.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await centerMobileStep(pressure);
     await expect(pressure).toHaveClass(/is-active/);
-    await ownership.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await expectMobileStepReadable(pressure);
+    await centerMobileStep(ownership);
     await expect(ownership).toHaveClass(/is-active/);
-    await pressure.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await expectMobileStepReadable(ownership);
+    await centerMobileStep(pressure);
     await expect(pressure).toHaveClass(/is-active/);
+    await expectMobileStepReadable(pressure);
 
-    for (const [visualSelector, stepSelector] of [
-      ['[data-system-visual]', '[data-story-step="ownership"]'],
-      ['[data-operating-visual]', '[data-operating-step="parallelize"]'],
-    ] as const) {
-      const visual = page.locator(visualSelector);
-      const step = page.locator(stepSelector);
-      await step.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
-      const [visualBox, stepBox] = await Promise.all([visual.boundingBox(), step.boundingBox()]);
-      expect(visualBox).not.toBeNull();
-      expect(stepBox).not.toBeNull();
-      const visualBottom = visualBox!.y + visualBox!.height;
-      const stepBottom = stepBox!.y + stepBox!.height;
-      const overlaps = visualBox!.y < stepBottom && visualBottom > stepBox!.y;
-      expect(overlaps, `${visualSelector} overlays ${stepSelector}`).toBeFalsy();
-    }
+    const parallelize = page.locator('[data-operating-step="parallelize"]');
+    await centerMobileStep(parallelize);
+    await expect(parallelize).toHaveClass(/is-active/);
+    await expectMobileStepReadable(parallelize);
+    await expect(page.locator('html')).not.toHaveAttribute('data-story-focus', /system|leadership/);
   }
 });
 
-test('keeps the compact operating diagram visible and reversible on short mobile screens', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile', 'Small mobile operating-system behavior');
+test('keeps mobile operating stages reversible and decision filters readable', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Small mobile operating-system story behavior');
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('./');
 
   const story = page.locator('[data-operating-story]');
-  const canvas = page.locator('.operating-visual__canvas');
+  const decisionConsole = page.locator('.decision-console');
   await expect(story).toHaveAttribute('data-motion', 'compact');
   await expect(story).toHaveAttribute('data-operating-stage', '1');
-  await expect(canvas).toBeVisible();
-  expect((await canvas.boundingBox())?.height ?? 0).toBeGreaterThan(120);
+  await expect(page.locator('.operating-visual__canvas')).toHaveCSS('display', 'none');
+  await expect(decisionConsole).toBeVisible();
+
+  const documentGap = await page.evaluate(() => {
+    const steps = document.querySelector('.operating-system__steps');
+    const filters = document.querySelector('.decision-console');
+    if (!steps || !filters) return -1;
+    return filters.getBoundingClientRect().top - steps.getBoundingClientRect().bottom;
+  });
+  expect(documentGap).toBeGreaterThanOrEqual(32);
+
   for (const title of await page.locator('.operating-visual__principles dt').all()) {
     expect(parseFloat(await title.evaluate((element) => getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(12);
   }
   for (const meaning of await page.locator('.decision-filter__meaning').all()) {
     expect(parseFloat(await meaning.evaluate((element) => getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(12);
   }
+  for (const effect of await page.locator('.decision-filter__effect').all()) {
+    await expect(effect).toBeVisible();
+    expect(parseFloat(await effect.evaluate((element) => getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(12);
+  }
 
   const parallelize = page.locator('[data-operating-step="parallelize"]');
-  await parallelize.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await centerMobileStep(parallelize);
   await expect(story).toHaveAttribute('data-operating-stage', '4');
   await expect(parallelize).toHaveClass(/is-active/);
+  await expectMobileStepReadable(parallelize);
+
+  const deliver = page.locator('[data-operating-step="deliver"]');
+  await centerMobileStep(deliver);
+  await expect(story).toHaveAttribute('data-operating-stage', '5');
+  await expect(deliver).toHaveClass(/is-active/);
+  await expectMobileStepReadable(deliver);
 
   const analyze = page.locator('[data-operating-step="analyze"]');
-  await analyze.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await centerMobileStep(analyze);
   await expect(story).toHaveAttribute('data-operating-stage', '1');
   await expect(analyze).toHaveClass(/is-active/);
+  await expectMobileStepReadable(analyze);
 });
 
 test('keeps the WebGL world fixed and steers it around story interfaces', async ({ page }, testInfo) => {
@@ -459,6 +464,40 @@ test('moves verified intent through a dependency-aware engineering system', asyn
   await expect(page.locator('[data-operating-group="deliver"]')).toHaveCSS('visibility', 'visible');
   await expect(page.locator('[data-operating-group="deliver"] .os-feedback-node')).toHaveCSS('visibility', 'visible');
 });
+
+async function centerMobileStep(step: Locator) {
+  await step.evaluate((element) => {
+    const top = element.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({
+      top: top + element.clientHeight / 2 - window.innerHeight / 2,
+      behavior: 'instant',
+    });
+  });
+}
+
+async function expectMobileStepReadable(step: Locator) {
+  const geometry = await step.evaluate((element) => {
+    const content = [
+      element.querySelector(':scope > span, .operating-step__meta'),
+      element.querySelector('h3'),
+      element.querySelector('p'),
+      element.querySelector('ul, blockquote'),
+    ].filter((candidate): candidate is Element => candidate instanceof Element)
+      .map((candidate) => candidate.getBoundingClientRect());
+    const nav = document.querySelector('.nav')?.getBoundingClientRect();
+    const progress = document.querySelector('.story-progress')?.getBoundingClientRect();
+
+    return {
+      contentTop: Math.min(...content.map((bounds) => bounds.top)),
+      contentBottom: Math.max(...content.map((bounds) => bounds.bottom)),
+      safeTop: nav?.bottom ?? 0,
+      safeBottom: progress?.top ?? window.innerHeight,
+    };
+  });
+
+  expect(geometry.contentTop, 'active copy should clear the fixed navigation').toBeGreaterThanOrEqual(geometry.safeTop + 8);
+  expect(geometry.contentBottom, 'active copy should clear the mobile story rail').toBeLessThanOrEqual(geometry.safeBottom - 8);
+}
 
 async function labelsStayInsideFrames(groups: Locator) {
   return groups.evaluateAll((elements) => elements.every((element) => {
