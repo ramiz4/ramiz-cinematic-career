@@ -22,30 +22,15 @@ export function initJourneyScrollytelling(root) {
   gsap.registerPlugin(ScrollTrigger);
 
   const steps = Array.from(story.querySelectorAll('[data-journey-step]'));
-  const rings = Array.from(story.querySelectorAll('[data-journey-ring]'));
-  const beam = story.querySelector('[data-journey-beam]');
-  const core = story.querySelector('[data-journey-core]');
-  const progress = story.querySelector('[data-journey-progress]');
-  const indexLabel = story.querySelector('[data-journey-index]');
-  const scopeLabel = story.querySelector('[data-journey-label]');
-
-  if (steps.length === 0 || rings.length === 0 || !beam || !core) return () => {};
+  if (steps.length === 0) return () => {};
 
   let activeStep = -1;
   let alive = true;
 
-  rings.forEach((ring) => {
-    const length = typeof ring.getTotalLength === 'function' ? ring.getTotalLength() : 900;
-    ring.dataset.pathLength = String(length);
-    gsap.set(ring, { strokeDasharray: length, strokeDashoffset: length });
-  });
-  gsap.set(beam, { svgOrigin: '160 160' });
-  gsap.set(core, { svgOrigin: '160 160' });
-  if (progress) gsap.set(progress, { scaleX: 0, transformOrigin: 'left center' });
-
-  const activate = (nextStep, immediate = false) => {
+  const activate = (nextStep) => {
     if (nextStep === activeStep) return;
     activeStep = nextStep;
+    story.dataset.journeyStage = String(nextStep + 1);
 
     steps.forEach((step, index) => {
       const isActive = index === nextStep;
@@ -54,23 +39,6 @@ export function initJourneyScrollytelling(root) {
       else step.removeAttribute('aria-current');
     });
 
-    if (indexLabel) indexLabel.textContent = `Scope ${String(nextStep + 1).padStart(2, '0')}`;
-    if (scopeLabel) scopeLabel.textContent = steps[nextStep]?.dataset.scope ?? '';
-
-    const duration = immediate ? 0 : .7;
-    rings.forEach((ring, index) => {
-      const reached = index <= nextStep;
-      gsap.to(ring, {
-        strokeDashoffset: reached ? 0 : Number(ring.dataset.pathLength),
-        opacity: index === nextStep ? .95 : reached ? .3 : .07,
-        duration,
-        ease: 'power2.out',
-        overwrite: true,
-      });
-    });
-    gsap.to(beam, { rotation: -58 + nextStep * 29, duration, ease: 'power2.out', overwrite: true });
-    gsap.to(core, { scale: 1 + nextStep * .17, duration, ease: 'back.out(1.6)', overwrite: true });
-    if (progress) gsap.to(progress, { scaleX: (nextStep + 1) / steps.length, duration, ease: 'power2.out', overwrite: true });
   };
 
   const media = gsap.matchMedia();
@@ -85,11 +53,11 @@ export function initJourneyScrollytelling(root) {
       story.dataset.motion = reduce ? 'reduced' : desktop ? 'tracked' : 'compact';
 
       if (reduce) {
-        activate(steps.length - 1, true);
+        activate(steps.length - 1);
         return () => {};
       }
 
-      activate(0, true);
+      activate(0);
       const triggers = steps.map((step, index) => ScrollTrigger.create({
         trigger: step,
         start: desktop ? 'top 62%' : 'top 68%',
@@ -116,6 +84,7 @@ export function initJourneyScrollytelling(root) {
       step.removeAttribute('aria-current');
     });
     delete story.dataset.motion;
+    delete story.dataset.journeyStage;
     instances.delete(story);
   };
 

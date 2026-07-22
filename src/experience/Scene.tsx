@@ -15,6 +15,7 @@ import {
   type InstancedMesh,
   type LineSegments,
 } from 'three';
+import { initGsapLayoutBridge } from '../js/gsap-layout-bridge.js';
 import { initThreeViewportController, updateThreeViewport } from '../js/three-viewport-controller.js';
 import { STORY_PHASES } from './storyPhases';
 
@@ -292,6 +293,8 @@ function EngineeringEngine({ compact = false }: SceneProps) {
 }
 
 export function Scene({ compact = false }: SceneProps) {
+  useEffect(() => initGsapLayoutBridge(document), []);
+
   return (
     <div className="scene" aria-hidden="true" data-testid="story-scene">
       <Canvas

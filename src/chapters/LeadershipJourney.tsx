@@ -28,22 +28,7 @@ export function LeadershipJourney() {
         The titles changed gradually. The real progression was in the radius of responsibility — from implementation to product systems, architecture and technical direction.
       </p>
       <div ref={rootRef} className="journey-system" data-journey-story>
-        <aside className="journey-radar" data-journey-visual aria-hidden="true">
-          <header><span>mandate.radius</span><strong>EXPANDING</strong></header>
-          <div className="journey-radar__dial">
-            <svg viewBox="0 0 320 320" role="presentation">
-              <path className="journey-radar__axis" d="M160 12 V308 M12 160 H308 M55 55 L265 265 M265 55 L55 265" />
-              {[38, 65, 92, 119, 146].map((radius) => <circle key={radius} data-journey-ring cx="160" cy="160" r={radius} />)}
-              <line data-journey-beam x1="160" y1="160" x2="160" y2="18" />
-              <circle data-journey-core cx="160" cy="160" r="11" />
-            </svg>
-            <div className="journey-radar__readout">
-              <span data-journey-index>Scope 01</span>
-              <strong data-journey-label>{leadershipJourney[0].scope}</strong>
-            </div>
-          </div>
-          <div className="journey-radar__footer"><span>Implementation</span><i><b data-journey-progress /></i><span>Direction</span></div>
-        </aside>
+        <div className="journey-viewport" data-three-viewport-slot aria-hidden="true" />
 
         <ol className="leadership-timeline">
           {leadershipJourney.map((entry, index) => (

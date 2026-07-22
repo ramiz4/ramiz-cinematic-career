@@ -39,6 +39,7 @@ test('assembles the interface once and keeps an immediate escape hatch', async (
 
   await page.goto('./?intro=1');
   await expect(intro).toBeVisible();
+  await expect(matrix).toHaveAttribute('data-matrix-state', 'running');
   await page.keyboard.press('Escape');
   await expect(intro).toHaveCount(0);
 });
@@ -68,7 +69,7 @@ test('tells the full scroll story without overflow or runtime errors', async ({ 
   await expect(page.locator('[data-story]')).toHaveCount(6);
 
   for (const phase of ['system', 'journey', 'impact', 'leadership', 'contact']) {
-    await page.locator(`#${phase}`).evaluate((element) => element.scrollIntoView({ block: 'start' }));
+    await page.locator(`#${phase}`).evaluate((element) => element.scrollIntoView({ block: 'start', behavior: 'instant' }));
     await expect(page.locator('html')).toHaveAttribute('data-story-phase', phase);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
     expect(overflow, `horizontal overflow in ${phase}`).toBeFalsy();
@@ -109,7 +110,7 @@ test('scrubs the system graph through the five architecture decisions', async ({
   await stage.evaluate((element) => {
     const top = element.getBoundingClientRect().top + window.scrollY;
     const range = element.scrollHeight - window.innerHeight;
-    window.scrollTo({ top: top + range * .94, behavior: 'auto' });
+    window.scrollTo({ top: top + range * .94, behavior: 'instant' });
   });
 
   await expect(page.locator('[data-story-step="ownership"]')).toHaveClass(/is-active/);
@@ -124,19 +125,46 @@ test('turns career scope and impact evidence into local scroll states', async ({
   await expect(page.locator('[data-impact-story]')).toHaveAttribute('data-motion', 'stacked');
 
   const journeyStep = page.locator('[data-journey-step]').nth(2);
-  await journeyStep.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await journeyStep.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
   await expect(journeyStep).toHaveClass(/is-active/);
-  await expect(page.locator('[data-journey-label]')).toHaveText('System coherence');
+  await expect(page.locator('[data-journey-story]')).toHaveAttribute('data-journey-stage', '3');
+  await expect(page.locator('.journey-radar')).toHaveCount(0);
 
   const impactCase = page.locator('[data-impact-case]').first();
   await impactCase.evaluate((element) => {
     const top = element.getBoundingClientRect().top + window.scrollY;
     const start = top - 96;
     const end = top + element.clientHeight - window.innerHeight + 64;
-    window.scrollTo({ top: start + (end - start) * .5, behavior: 'auto' });
+    window.scrollTo({ top: start + (end - start) * .5, behavior: 'instant' });
   });
   await expect(impactCase.locator('[data-impact-status]')).toHaveText('Decision');
   await expect(impactCase.locator('[data-impact-stage="decision"]')).toHaveClass(/is-active/);
+});
+
+test('keeps the WebGL world fixed and steers it around story interfaces', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Desktop viewport collision behavior');
+  await page.goto('./');
+
+  const scene = page.getByTestId('story-scene');
+  await expect(scene).toHaveCSS('position', 'fixed');
+  await expect(scene.locator('canvas')).toHaveCount(1);
+
+  await page.locator('[data-system-scroll]').evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-0.42');
+
+  await page.locator('[data-journey-step]').nth(2).evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-0.62');
+  await expect(page.locator('[data-three-viewport-slot]')).toBeVisible();
+
+  await page.locator('[data-impact-story]').evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-0.9');
+
+  await page.locator('[data-operating-story]').evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-0.5');
+
+  await page.locator('#contact').evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '0');
+  await expect(scene.locator('canvas')).toHaveCount(1);
 });
 
 test('moves verified intent through a dependency-aware engineering system', async ({ page }, testInfo) => {
@@ -146,21 +174,21 @@ test('moves verified intent through a dependency-aware engineering system', asyn
   await expect(story).toHaveAttribute('data-motion', 'pinned');
 
   const verify = page.locator('[data-operating-step="verify"]');
-  await verify.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await verify.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
   await expect(verify).toHaveClass(/is-active/);
   await expect(story).toHaveAttribute('data-operating-stage', '2');
   await expect(page.locator('[data-operating-index]')).toHaveText('02 / 05');
   await expect(page.locator('[data-operating-label]')).toHaveText('Human verified');
 
   const structure = page.locator('[data-operating-step="structure"]');
-  await structure.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await structure.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
   await expect(structure).toHaveClass(/is-active/);
   await expect(story).toHaveAttribute('data-operating-stage', '3');
   await expect(page.locator('[data-operating-group="structure"]')).toHaveCSS('visibility', 'visible');
   expect(await labelsStayInsideFrames(page.locator('[data-operating-group="structure"] .os-ticket'))).toBeTruthy();
 
   const parallelize = page.locator('[data-operating-step="parallelize"]');
-  await parallelize.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await parallelize.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
   await expect(parallelize).toHaveClass(/is-active/);
   await expect(story).toHaveAttribute('data-operating-stage', '4');
   await expect(page.locator('[data-operating-group="parallelize"]')).toHaveCSS('visibility', 'visible');
@@ -170,7 +198,7 @@ test('moves verified intent through a dependency-aware engineering system', asyn
   await expect(page.locator('.story-progress')).toHaveCSS('opacity', '0');
 
   const deliver = page.locator('[data-operating-step="deliver"]');
-  await deliver.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await deliver.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
   await expect(deliver).toHaveClass(/is-active/);
   await expect(story).toHaveAttribute('data-operating-stage', '5');
   await expect(page.locator('[data-operating-group="deliver"]')).toHaveCSS('visibility', 'visible');
