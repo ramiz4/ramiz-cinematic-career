@@ -473,6 +473,16 @@ async function centerMobileStep(step: Locator) {
       behavior: 'instant',
     });
   });
+
+  await expect(step).toHaveClass(/is-active/);
+  await step.evaluate(async (element) => {
+    await Promise.all(element.getAnimations().map((animation) => animation.finished.catch(() => undefined)));
+    const top = element.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({
+      top: top + element.clientHeight / 2 - window.innerHeight / 2,
+      behavior: 'instant',
+    });
+  });
 }
 
 async function expectMobileStepReadable(step: Locator) {
