@@ -11,9 +11,9 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         id: '/ramiz-cinematic-career/',
-        name: 'Ramiz Loki — Cinematic Career',
+        name: 'Ramiz Loki — Technology Leadership',
         short_name: 'Ramiz Loki',
-        description: 'An immersive software engineering career experience.',
+        description: 'Architecture, delivery and technical leadership translated into business leverage.',
         theme_color: '#07130d',
         background_color: '#050806',
         display: 'standalone',
@@ -28,13 +28,7 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: '/ramiz-cinematic-career/index.html',
-        globPatterns: ['**/*.{js,css,html,svg,png,webp}'],
-        globIgnores: ['**/Scene-*.js'],
-        runtimeCaching: [{
-          urlPattern: /\/assets\/Scene-.*\.js$/,
-          handler: 'CacheFirst',
-          options: { cacheName: 'cinematic-3d-story', expiration: { maxEntries: 2, maxAgeSeconds: 60 * 60 * 24 * 30 } }
-        }]
+        globPatterns: ['**/*.{js,css,html,svg,png,webp}']
       }
     })
   ],

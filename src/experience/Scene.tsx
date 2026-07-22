@@ -15,9 +15,15 @@ import {
   type InstancedMesh,
   type LineSegments,
 } from 'three';
+import { initGsapLayoutBridge } from '../js/gsap-layout-bridge.js';
+import { initThreeViewportController, updateThreeViewport } from '../js/three-viewport-controller.js';
 
-const STORY_PHASES = ['hero', 'universe', 'career', 'projects', 'architect', 'contact'] as const;
 const LINK_COUNT = 28;
+const PHASE_OPACITY = [.07, .24, .14, .09, .22, .18] as const;
+const DESKTOP_X = [2.2, 1.6, 2.2, 1.8, 2.2, 1.7] as const;
+const COMPACT_X = [1.7, .7, .75, .7, .72, .62] as const;
+const COMPACT_Y = [2.55, .95, .95, .95, .95, .95] as const;
+const COMPACT_SCALE = [.45, .72, .72, .72, .72, .72] as const;
 
 type SceneProps = { compact?: boolean };
 
@@ -111,17 +117,26 @@ function EngineeringEngine({ compact = false }: SceneProps) {
   const linksRef = useRef<LineSegments>(null);
   const lineAttributeRef = useRef<BufferAttribute>(null);
   const linksMaterialRef = useRef<LineBasicMaterial>(null);
+  const viewportRef = useRef<Group>(null);
+  const pointerRef = useRef<Group>(null);
   const worldRef = useRef<Group>(null);
   const coreRef = useRef<Group>(null);
   const coreMaterialRef = useRef<MeshBasicMaterial>(null);
   const portalRef = useRef<Group>(null);
   const storyPosition = useRef(0);
-  const activePhase = useRef(-1);
   const anchors = useStoryAnchors();
   const layouts = useMemo(() => createLayouts(count), [count]);
   const currentPositions = useMemo(() => Array.from({ length: count }, () => new Vector3()), [count]);
+  const instanceMotion = useMemo(() => Array.from({ length: count }, (_, index) => ({
+    rotationX: seeded(index, 11) * Math.PI,
+    rotationY: seeded(index, 12) * Math.PI,
+    rotationZ: seeded(index, 13) * Math.PI,
+    pulse: .72 + seeded(index, 14) * .7,
+  })), [count]);
   const dummy = useMemo(() => new Object3D(), []);
   const mixedPosition = useMemo(() => new Vector3(), []);
+
+  useEffect(() => initThreeViewportController(), []);
 
   useEffect(() => {
     const fragments = fragmentsRef.current;
@@ -134,10 +149,12 @@ function EngineeringEngine({ compact = false }: SceneProps) {
     if (fragments.instanceColor) fragments.instanceColor.needsUpdate = true;
   }, [count]);
 
-  useFrame(({ clock }, delta) => {
+  useFrame(({ clock, viewport }, delta) => {
     const fragments = fragmentsRef.current;
+    const viewportLayer = viewportRef.current;
+    const pointerLayer = pointerRef.current;
     const world = worldRef.current;
-    if (!fragments || !world) return;
+    if (!fragments || !viewportLayer || !pointerLayer || !world) return;
 
     const measuredAnchors = anchors.current;
     let rawStoryPosition = 0;
@@ -160,21 +177,17 @@ function EngineeringEngine({ compact = false }: SceneProps) {
     const mix = MathUtils.smoothstep(position - fromIndex, 0, 1);
     const elapsed = clock.elapsedTime;
 
-    if (activePhase.current !== Math.round(position)) {
-      activePhase.current = Math.round(position);
-      document.documentElement.dataset.storyPhase = STORY_PHASES[activePhase.current];
-    }
-
     for (let index = 0; index < count; index += 1) {
+      const motion = instanceMotion[index];
       mixedPosition.lerpVectors(layouts[fromIndex][index], layouts[toIndex][index], mix);
       currentPositions[index].copy(mixedPosition);
       dummy.position.copy(mixedPosition);
       dummy.rotation.set(
-        seeded(index, 11) * Math.PI + elapsed * .08,
-        seeded(index, 12) * Math.PI + elapsed * .12,
-        seeded(index, 13) * Math.PI,
+        motion.rotationX + elapsed * .08,
+        motion.rotationY + elapsed * .12,
+        motion.rotationZ,
       );
-      const pulse = .72 + seeded(index, 14) * .7 + Math.sin(elapsed * 1.4 + index) * .08;
+      const pulse = motion.pulse + Math.sin(elapsed * 1.4 + index) * .08;
       dummy.scale.setScalar(pulse);
       dummy.updateMatrix();
       fragments.setMatrixAt(index, dummy.matrix);
@@ -190,22 +203,30 @@ function EngineeringEngine({ compact = false }: SceneProps) {
     }
     if (lineAttribute) lineAttribute.needsUpdate = true;
     if (linksMaterialRef.current) {
-      const phaseOpacity = [.07, .24, .14, .09, .22, .18];
       linksMaterialRef.current.opacity = MathUtils.lerp(
-        phaseOpacity[fromIndex],
-        phaseOpacity[toIndex],
+        PHASE_OPACITY[fromIndex],
+        PHASE_OPACITY[toIndex],
         mix,
       );
     }
 
-    const desktopX = [2.2, 1.6, 2.2, 1.8, 2.2, 1.7];
-    const targetX = compact ? 0 : MathUtils.lerp(desktopX[fromIndex], desktopX[toIndex], mix);
-    const targetY = compact ? .95 : 0;
+    const targetX = compact
+      ? MathUtils.lerp(COMPACT_X[fromIndex], COMPACT_X[toIndex], mix)
+      : MathUtils.lerp(DESKTOP_X[fromIndex], DESKTOP_X[toIndex], mix);
+    const targetY = compact ? MathUtils.lerp(COMPACT_Y[fromIndex], COMPACT_Y[toIndex], mix) : 0;
+    const targetScale = compact ? MathUtils.lerp(COMPACT_SCALE[fromIndex], COMPACT_SCALE[toIndex], mix) : 1;
     world.position.x = MathUtils.damp(world.position.x, targetX, 3.5, delta);
     world.position.y = MathUtils.damp(world.position.y, targetY, 3.5, delta);
-    world.scale.setScalar(MathUtils.damp(world.scale.x, compact ? .72 : 1, 4, delta));
+    world.scale.setScalar(MathUtils.damp(world.scale.x, targetScale, 4, delta));
     world.rotation.y = elapsed * .035 + position * .17;
     world.rotation.x = Math.sin(elapsed * .2) * .035;
+
+    const viewportTransform = updateThreeViewport(delta);
+    viewportLayer.position.x = compact ? 0 : viewportTransform.layoutX * viewport.width * .5;
+    pointerLayer.position.x = compact ? 0 : viewportTransform.pointerX * Math.min(viewport.width * .024, .38);
+    pointerLayer.position.y = compact ? 0 : viewportTransform.pointerY * .24;
+    pointerLayer.rotation.x = compact ? 0 : viewportTransform.rotationX;
+    pointerLayer.rotation.y = compact ? 0 : viewportTransform.rotationY;
 
     if (coreRef.current) {
       const visibility = MathUtils.clamp(1 - position * 1.3, 0, 1);
@@ -222,67 +243,72 @@ function EngineeringEngine({ compact = false }: SceneProps) {
   });
 
   return (
-    <group ref={worldRef}>
-      <group ref={coreRef}>
-        <mesh>
-          <icosahedronGeometry args={[1.05, 2]} />
-          <meshBasicMaterial ref={coreMaterialRef} color="#76ffb8" wireframe transparent opacity={.8} />
-        </mesh>
-        <mesh rotation={[Math.PI / 4, 0, 0]}>
-          <torusGeometry args={[1.45, .018, 8, 96]} />
-          <meshBasicMaterial color="#36ff9d" transparent opacity={.45} blending={AdditiveBlending} />
-        </mesh>
-        <mesh rotation={[0, Math.PI / 3, Math.PI / 2]}>
-          <torusGeometry args={[1.72, .012, 8, 96]} />
-          <meshBasicMaterial color="#8fffc5" transparent opacity={.25} blending={AdditiveBlending} />
-        </mesh>
+    <group ref={viewportRef}>
+      <group ref={pointerRef}>
+        <group ref={worldRef}>
+          <group ref={coreRef}>
+            <mesh>
+              <icosahedronGeometry args={[1.05, 2]} />
+              <meshBasicMaterial ref={coreMaterialRef} color="#76ffb8" wireframe transparent opacity={.8} />
+            </mesh>
+            <mesh rotation={[Math.PI / 4, 0, 0]}>
+              <torusGeometry args={[1.45, .018, 8, 96]} />
+              <meshBasicMaterial color="#36ff9d" transparent opacity={.45} blending={AdditiveBlending} />
+            </mesh>
+            <mesh rotation={[0, Math.PI / 3, Math.PI / 2]}>
+              <torusGeometry args={[1.72, .012, 8, 96]} />
+              <meshBasicMaterial color="#8fffc5" transparent opacity={.25} blending={AdditiveBlending} />
+            </mesh>
+          </group>
+
+          <instancedMesh ref={fragmentsRef} args={[undefined, undefined, count]} frustumCulled={false}>
+            <boxGeometry args={[.1, .1, .42]} />
+            <meshStandardMaterial
+              vertexColors
+              color="#b8ffda"
+              emissive="#0b7548"
+              emissiveIntensity={1.4}
+              metalness={.75}
+              roughness={.22}
+            />
+          </instancedMesh>
+
+          <lineSegments ref={linksRef}>
+            <bufferGeometry>
+              <bufferAttribute ref={lineAttributeRef} attach="attributes-position" args={[new Float32Array(LINK_COUNT * 6), 3]} />
+            </bufferGeometry>
+            <lineBasicMaterial ref={linksMaterialRef} color="#62ffad" transparent opacity={.1} />
+          </lineSegments>
+
+          <group ref={portalRef} scale={.001}>
+            <mesh>
+              <torusGeometry args={[2.05, .055, 12, 128]} />
+              <meshBasicMaterial color="#36ff9d" transparent opacity={.8} blending={AdditiveBlending} />
+            </mesh>
+            <mesh scale={1.08}>
+              <torusGeometry args={[2.05, .016, 8, 128]} />
+              <meshBasicMaterial color="#d5ffe9" transparent opacity={.45} blending={AdditiveBlending} />
+            </mesh>
+          </group>
+
+          <pointLight position={[0, 0, 3]} intensity={compact ? 16 : 24} color="#45ffa5" distance={9} />
+        </group>
       </group>
-
-      <instancedMesh ref={fragmentsRef} args={[undefined, undefined, count]} frustumCulled={false}>
-        <boxGeometry args={[.1, .1, .42]} />
-        <meshStandardMaterial
-          vertexColors
-          color="#b8ffda"
-          emissive="#0b7548"
-          emissiveIntensity={1.4}
-          metalness={.75}
-          roughness={.22}
-        />
-      </instancedMesh>
-
-      <lineSegments ref={linksRef}>
-        <bufferGeometry>
-          <bufferAttribute ref={lineAttributeRef} attach="attributes-position" args={[new Float32Array(LINK_COUNT * 6), 3]} />
-        </bufferGeometry>
-        <lineBasicMaterial ref={linksMaterialRef} color="#62ffad" transparent opacity={.1} />
-      </lineSegments>
-
-      <group ref={portalRef} scale={.001}>
-        <mesh>
-          <torusGeometry args={[2.05, .055, 12, 128]} />
-          <meshBasicMaterial color="#36ff9d" transparent opacity={.8} blending={AdditiveBlending} />
-        </mesh>
-        <mesh scale={1.08}>
-          <torusGeometry args={[2.05, .016, 8, 128]} />
-          <meshBasicMaterial color="#d5ffe9" transparent opacity={.45} blending={AdditiveBlending} />
-        </mesh>
-      </group>
-
-      <pointLight position={[0, 0, 3]} intensity={compact ? 16 : 24} color="#45ffa5" distance={9} />
     </group>
   );
 }
 
 export function Scene({ compact = false }: SceneProps) {
+  useEffect(() => initGsapLayoutBridge(document), []);
+
   return (
     <div className="scene" aria-hidden="true" data-testid="story-scene">
       <Canvas
         dpr={compact ? 1 : [1, 1.5]}
         camera={{ position: [0, 0, compact ? 9.2 : 8], fov: compact ? 58 : 50 }}
-        gl={{ antialias: !compact, alpha: false, powerPreference: 'high-performance' }}
+        gl={{ antialias: !compact, alpha: true, powerPreference: 'high-performance' }}
         performance={{ min: .6 }}
       >
-        <color attach="background" args={['#030705']} />
         <fog attach="fog" args={['#030705', 8, 18]} />
         <ambientLight intensity={.5} />
         <directionalLight position={[-3, 4, 5]} intensity={2.4} color="#a9ffd2" />

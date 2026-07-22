@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from 'react';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const LazyScene = lazy(() => import('./Scene').then((module) => ({ default: module.Scene })));
@@ -20,6 +20,21 @@ function StaticScene() {
   return <div className="scene scene--static" aria-hidden="true" data-testid="static-scene"><i /><i /><i /></div>;
 }
 
+type SceneErrorBoundaryProps = { children: ReactNode };
+type SceneErrorBoundaryState = { failed: boolean };
+
+class SceneErrorBoundary extends Component<SceneErrorBoundaryProps, SceneErrorBoundaryState> {
+  state: SceneErrorBoundaryState = { failed: false };
+
+  static getDerivedStateFromError(): SceneErrorBoundaryState {
+    return { failed: true };
+  }
+
+  render() {
+    return this.state.failed ? <StaticScene /> : this.props.children;
+  }
+}
+
 export function ExperienceLayer() {
   const reducedMotion = useReducedMotion();
   const compact = useCompactExperience();
@@ -27,8 +42,10 @@ export function ExperienceLayer() {
   if (reducedMotion) return <StaticScene />;
 
   return (
-    <Suspense fallback={<StaticScene />}>
-      <LazyScene compact={compact} />
-    </Suspense>
+    <SceneErrorBoundary>
+      <Suspense fallback={<StaticScene />}>
+        <LazyScene compact={compact} />
+      </Suspense>
+    </SceneErrorBoundary>
   );
 }
