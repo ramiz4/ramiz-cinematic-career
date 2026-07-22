@@ -277,13 +277,68 @@ test('keeps compact journey navigation available outside pinned visualizations',
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('./');
 
-  for (const selector of ['[data-journey-story]', '[data-impact-story]']) {
+  for (const selector of [
+    '[data-system-story]',
+    '[data-journey-story]',
+    '[data-impact-story]',
+    '[data-operating-story]',
+  ]) {
     const story = page.locator(selector);
     await expect(story).toHaveAttribute('data-motion', 'compact');
     await story.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
-    await expect(page.locator('html')).not.toHaveAttribute('data-story-focus', /journey|impact/);
+    await expect(page.locator('html')).not.toHaveAttribute('data-story-focus', /system|journey|impact|leadership/);
     await expect(page.locator('.story-progress')).toHaveCSS('opacity', '1');
     await expect(page.locator('.story-progress')).toHaveCSS('pointer-events', 'auto');
+  }
+});
+
+test('keeps compact system snapshots out of the story text flow', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Small mobile snapshot behavior');
+  for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('./');
+
+    for (const [visualSelector, flowSelector] of [
+      ['[data-system-visual]', '.system-story__beats'],
+      ['[data-operating-visual]', '.operating-system__steps'],
+    ] as const) {
+      const visual = page.locator(visualSelector);
+      await expect(visual).toHaveCSS('position', 'relative');
+      const documentGap = await page.evaluate(({ visualSelector, flowSelector }) => {
+        const visualElement = document.querySelector(visualSelector);
+        const flowElement = document.querySelector(flowSelector);
+        if (!visualElement || !flowElement) return -1;
+        const visualRect = visualElement.getBoundingClientRect();
+        const flowRect = flowElement.getBoundingClientRect();
+        return flowRect.top - visualRect.bottom;
+      }, { visualSelector, flowSelector });
+      expect(documentGap, `${visualSelector} needs editorial breathing room`).toBeGreaterThanOrEqual(32);
+    }
+
+    const pressure = page.locator('[data-story-step="pressure"]');
+    const ownership = page.locator('[data-story-step="ownership"]');
+    await pressure.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await expect(pressure).toHaveClass(/is-active/);
+    await ownership.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await expect(ownership).toHaveClass(/is-active/);
+    await pressure.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await expect(pressure).toHaveClass(/is-active/);
+
+    for (const [visualSelector, stepSelector] of [
+      ['[data-system-visual]', '[data-story-step="ownership"]'],
+      ['[data-operating-visual]', '[data-operating-step="parallelize"]'],
+    ] as const) {
+      const visual = page.locator(visualSelector);
+      const step = page.locator(stepSelector);
+      await step.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
+      const [visualBox, stepBox] = await Promise.all([visual.boundingBox(), step.boundingBox()]);
+      expect(visualBox).not.toBeNull();
+      expect(stepBox).not.toBeNull();
+      const visualBottom = visualBox!.y + visualBox!.height;
+      const stepBottom = stepBox!.y + stepBox!.height;
+      const overlaps = visualBox!.y < stepBottom && visualBottom > stepBox!.y;
+      expect(overlaps, `${visualSelector} overlays ${stepSelector}`).toBeFalsy();
+    }
   }
 });
 

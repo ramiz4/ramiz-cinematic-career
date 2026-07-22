@@ -12,7 +12,8 @@ function resolveStory(root) {
 
 function setStoryFocus(story, focused) {
   const documentElement = story.ownerDocument.documentElement;
-  if (focused) documentElement.dataset.storyFocus = 'journey';
+  const desktop = story.ownerDocument.defaultView?.matchMedia('(min-width: 801px)').matches;
+  if (focused && desktop) documentElement.dataset.storyFocus = 'journey';
   else if (documentElement.dataset.storyFocus === 'journey') delete documentElement.dataset.storyFocus;
 }
 

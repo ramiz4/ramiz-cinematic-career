@@ -92,7 +92,8 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
 
   const setSystemFocus = (focused) => {
     const documentElement = story.ownerDocument.documentElement;
-    if (focused) documentElement.dataset.storyFocus = 'system';
+    const desktop = story.ownerDocument.defaultView?.matchMedia('(min-width: 801px)').matches;
+    if (focused && desktop) documentElement.dataset.storyFocus = 'system';
     else if (documentElement.dataset.storyFocus === 'system') delete documentElement.dataset.storyFocus;
   };
 
@@ -152,16 +153,24 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
           pinSpacing: false,
           anticipatePin: desktop ? 1 : 0,
           invalidateOnRefresh: true,
-          onUpdate: (trigger) => activateStep(trigger.progress),
+          onUpdate: desktop ? (trigger) => activateStep(trigger.progress) : undefined,
         },
       });
 
-      const focusTrigger = ScrollTrigger.create({
+      const compactStepTriggers = desktop ? [] : steps.map((step, index) => ScrollTrigger.create({
+        trigger: step,
+        start: 'top 68%',
+        end: 'bottom 32%',
+        onEnter: () => activateStep((index + .01) / steps.length),
+        onEnterBack: () => activateStep((index + .01) / steps.length),
+      }));
+
+      const focusTrigger = desktop ? ScrollTrigger.create({
         trigger: scrollRegion,
-        start: desktop ? 'top top' : 'top 68%',
-        end: desktop ? 'bottom bottom' : 'bottom 32%',
+        start: 'top top',
+        end: 'bottom bottom',
         onToggle: (trigger) => setSystemFocus(trigger.isActive),
-      });
+      }) : null;
 
       timeline
         .addLabel('pressure', 0)
@@ -194,7 +203,8 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
       if (progress) timeline.to(progress, { scaleX: 1, duration: 5 }, 0);
 
       return () => {
-        focusTrigger.kill();
+        focusTrigger?.kill();
+        compactStepTriggers.forEach((trigger) => trigger.kill());
         activeStep = -1;
         setSystemFocus(false);
         delete story.dataset.motion;

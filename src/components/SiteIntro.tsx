@@ -27,6 +27,13 @@ export function SiteIntro({ onComplete }: SiteIntroProps) {
 
     const failSafe = window.setTimeout(complete, 7_000);
     const focusFrame = window.requestAnimationFrame(() => skipRef.current?.focus());
+    const containFocus = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      event.preventDefault();
+      skipRef.current?.focus();
+    };
+
+    window.addEventListener('keydown', containFocus);
 
     void import('../js/intro-scrollytelling.js')
       .then(({ initSiteIntro }) => {
@@ -39,6 +46,7 @@ export function SiteIntro({ onComplete }: SiteIntroProps) {
       disposed = true;
       window.clearTimeout(failSafe);
       window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener('keydown', containFocus);
       cleanup();
     };
   }, [onComplete]);
