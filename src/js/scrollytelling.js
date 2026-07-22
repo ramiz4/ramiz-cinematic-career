@@ -152,9 +152,15 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
           pinSpacing: false,
           anticipatePin: desktop ? 1 : 0,
           invalidateOnRefresh: true,
-          onToggle: (trigger) => setSystemFocus(trigger.isActive),
           onUpdate: (trigger) => activateStep(trigger.progress),
         },
+      });
+
+      const focusTrigger = ScrollTrigger.create({
+        trigger: scrollRegion,
+        start: desktop ? 'top top' : 'top 68%',
+        end: desktop ? 'bottom bottom' : 'bottom 32%',
+        onToggle: (trigger) => setSystemFocus(trigger.isActive),
       });
 
       timeline
@@ -188,6 +194,7 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
       if (progress) timeline.to(progress, { scaleX: 1, duration: 5 }, 0);
 
       return () => {
+        focusTrigger.kill();
         activeStep = -1;
         setSystemFocus(false);
         delete story.dataset.motion;

@@ -17,7 +17,6 @@ import {
 } from 'three';
 import { initGsapLayoutBridge } from '../js/gsap-layout-bridge.js';
 import { initThreeViewportController, updateThreeViewport } from '../js/three-viewport-controller.js';
-import { STORY_PHASES } from './storyPhases';
 
 const LINK_COUNT = 28;
 
@@ -120,7 +119,6 @@ function EngineeringEngine({ compact = false }: SceneProps) {
   const coreMaterialRef = useRef<MeshBasicMaterial>(null);
   const portalRef = useRef<Group>(null);
   const storyPosition = useRef(0);
-  const activePhase = useRef(-1);
   const anchors = useStoryAnchors();
   const layouts = useMemo(() => createLayouts(count), [count]);
   const currentPositions = useMemo(() => Array.from({ length: count }, () => new Vector3()), [count]);
@@ -167,11 +165,6 @@ function EngineeringEngine({ compact = false }: SceneProps) {
     const toIndex = Math.min(layouts.length - 1, fromIndex + 1);
     const mix = MathUtils.smoothstep(position - fromIndex, 0, 1);
     const elapsed = clock.elapsedTime;
-
-    if (activePhase.current !== Math.round(position)) {
-      activePhase.current = Math.round(position);
-      document.documentElement.dataset.storyPhase = STORY_PHASES[activePhase.current].id;
-    }
 
     for (let index = 0; index < count; index += 1) {
       mixedPosition.lerpVectors(layouts[fromIndex][index], layouts[toIndex][index], mix);

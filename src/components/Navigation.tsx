@@ -1,10 +1,11 @@
 import { AnimatePresence, LayoutGroup, motion, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { STORY_PHASES } from '../experience/storyPhases';
+import { useActiveStoryPhase } from '../experience/useActiveStoryPhase';
 
 export function Navigation() {
   const { scrollY, scrollYProgress } = useScroll();
-  const [active, setActive] = useState(0);
+  const active = useActiveStoryPhase();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const reduceMotion = useReducedMotion();
@@ -13,13 +14,6 @@ export function Navigation() {
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
     setScrolled(latest > 24);
-    const viewportCenter = latest + window.innerHeight * .42;
-    let next = 0;
-    STORY_PHASES.forEach((phase, index) => {
-      const section = document.getElementById(phase.id);
-      if (section && section.offsetTop <= viewportCenter) next = index;
-    });
-    setActive((current) => current === next ? current : next);
   });
 
   useEffect(() => {

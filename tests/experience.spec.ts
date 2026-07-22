@@ -71,6 +71,7 @@ test('tells the full scroll story without overflow or runtime errors', async ({ 
   for (const phase of ['system', 'journey', 'impact', 'leadership', 'contact']) {
     await page.locator(`#${phase}`).evaluate((element) => element.scrollIntoView({ block: 'start', behavior: 'instant' }));
     await expect(page.locator('html')).toHaveAttribute('data-story-phase', phase);
+    await expect(page.locator(`.nav a[href="#${phase}"]`)).toHaveAttribute('aria-current', 'page');
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
     expect(overflow, `horizontal overflow in ${phase}`).toBeFalsy();
   }
@@ -150,17 +151,23 @@ test('keeps the WebGL world fixed and steers it around story interfaces', async 
   await expect(scene.locator('canvas')).toHaveCount(1);
 
   await page.locator('[data-system-scroll]').evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
-  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-0.42');
+  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-0.56');
 
+  await page.locator('#journey').evaluate((element) => element.scrollIntoView({ block: 'start', behavior: 'instant' }));
+  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '0');
+  await expect(page.locator('html')).not.toHaveAttribute('data-story-focus', 'system');
+  await expect(page.locator('.story-progress')).toHaveCSS('opacity', '1');
   await page.locator('[data-journey-step]').nth(2).evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
-  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-0.62');
+  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-0.6');
   await expect(page.locator('[data-three-viewport-slot]')).toBeVisible();
 
+  await page.locator('#impact').evaluate((element) => element.scrollIntoView({ block: 'start', behavior: 'instant' }));
+  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '0');
   await page.locator('[data-impact-story]').evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
-  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-0.9');
+  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-0.82');
 
   await page.locator('[data-operating-story]').evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
-  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-0.5');
+  await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '-1');
 
   await page.locator('#contact').evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }));
   await expect(page.locator('html')).toHaveAttribute('data-three-viewport-x', '0');

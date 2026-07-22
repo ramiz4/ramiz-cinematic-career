@@ -62,21 +62,21 @@ export const decisionFilters = [
   {
     principle: 'Clean Architecture',
     meaning: 'The Dependency Rule',
-    effect: 'Domain and use cases stay independent of UI, frameworks and infrastructure.',
+    effect: 'Source-code dependencies point inward; UI and infrastructure depend on domain policy.',
   },
   {
     principle: 'SOLID',
     meaning: 'Single Responsibility · Open/Closed · Liskov Substitution · Interface Segregation · Dependency Inversion',
-    effect: 'Five design principles for maintainable, extensible object-oriented systems.',
+    effect: 'Responsibilities stay focused while abstractions remain substitutable and extensible.',
   },
   {
     principle: 'DRY',
     meaning: 'Don’t Repeat Yourself',
-    effect: 'Avoid duplicated knowledge; keep each rule authoritative in one place.',
+    effect: 'Each piece of system knowledge has one authoritative representation.',
   },
   {
     principle: 'YAGNI',
     meaning: 'You Aren’t Gonna Need It',
-    effect: 'Implement verified requirements, not speculative flexibility.',
+    effect: 'Implement verified needs now; defer speculative flexibility until evidence exists.',
   },
 ] as const;

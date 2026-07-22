@@ -1,12 +1,9 @@
 .chapter--journey,
 .chapter--impact { align-content: start; min-height: auto; }
 
-.chapter--journey::before {
-  background: linear-gradient(90deg, rgba(3, 7, 5, .18), rgba(3, 7, 5, .4) 42%, rgba(3, 7, 5, .94) 64%);
-}
-
+.chapter--journey::before,
 .chapter--impact::before {
-  background: linear-gradient(90deg, rgba(3, 7, 5, .3), rgba(3, 7, 5, .72) 34%, rgba(3, 7, 5, .96) 50%);
+  background: linear-gradient(180deg, rgba(3, 7, 5, .12), rgba(3, 7, 5, .22) 50%, rgba(3, 7, 5, .12));
 }
 
 .journey-system {
@@ -93,7 +90,7 @@
 .impact-case__footer li { padding: .45rem .65rem; border: 1px solid var(--line); border-radius: 999px; color: #b8cec0; font-size: .68rem; }
 
 .impact-cases {
-  --impact-case-distance: 215svh;
+  --impact-case-distance: 270svh;
   --impact-mobile-stage-distance: 52svh;
 
   display: grid;
