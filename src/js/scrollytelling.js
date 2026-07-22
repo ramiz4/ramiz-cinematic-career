@@ -107,9 +107,29 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
     },
     (context) => {
       const { reduce, desktop } = context.conditions;
-      const drawablePaths = [...flowPaths, ...pipelinePaths];
 
       story.dataset.motion = reduce ? 'reduced' : desktop ? 'pinned' : 'compact';
+
+      if (!desktop) {
+        activateStep(reduce ? 1 : 0);
+
+        const compactStepTriggers = reduce ? [] : steps.map((step, index) => ScrollTrigger.create({
+          trigger: step,
+          start: 'top 68%',
+          end: 'bottom 32%',
+          onEnter: () => activateStep((index + .01) / steps.length),
+          onEnterBack: () => activateStep((index + .01) / steps.length),
+        }));
+
+        return () => {
+          compactStepTriggers.forEach((trigger) => trigger.kill());
+          activeStep = -1;
+          setSystemFocus(false);
+          delete story.dataset.motion;
+        };
+      }
+
+      const drawablePaths = [...flowPaths, ...pipelinePaths];
 
       gsap.set([monolith, ...warnings, ...services, ...metrics, ...ownershipZones, ...packets, outcome], {
         transformBox: 'fill-box',
@@ -146,31 +166,23 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
         defaults: { ease: 'none' },
         scrollTrigger: {
           trigger: scrollRegion,
-          start: desktop ? 'top top' : 'top 65%',
-          end: desktop ? 'bottom bottom' : 'bottom 35%',
-          scrub: desktop ? .9 : .45,
-          pin: desktop ? visual : false,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: .9,
+          pin: visual,
           pinSpacing: false,
-          anticipatePin: desktop ? 1 : 0,
+          anticipatePin: 1,
           invalidateOnRefresh: true,
-          onUpdate: desktop ? (trigger) => activateStep(trigger.progress) : undefined,
+          onUpdate: (trigger) => activateStep(trigger.progress),
         },
       });
 
-      const compactStepTriggers = desktop ? [] : steps.map((step, index) => ScrollTrigger.create({
-        trigger: step,
-        start: 'top 68%',
-        end: 'bottom 32%',
-        onEnter: () => activateStep((index + .01) / steps.length),
-        onEnterBack: () => activateStep((index + .01) / steps.length),
-      }));
-
-      const focusTrigger = desktop ? ScrollTrigger.create({
+      const focusTrigger = ScrollTrigger.create({
         trigger: scrollRegion,
         start: 'top top',
         end: 'bottom bottom',
         onToggle: (trigger) => setSystemFocus(trigger.isActive),
-      }) : null;
+      });
 
       timeline
         .addLabel('pressure', 0)
@@ -203,8 +215,7 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
       if (progress) timeline.to(progress, { scaleX: 1, duration: 5 }, 0);
 
       return () => {
-        focusTrigger?.kill();
-        compactStepTriggers.forEach((trigger) => trigger.kill());
+        focusTrigger.kill();
         activeStep = -1;
         setSystemFocus(false);
         delete story.dataset.motion;
