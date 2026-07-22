@@ -1,4 +1,4 @@
-export const SITE_INTRO_SESSION_KEY = 'ramiz:architecture-intro:v1';
+export const SITE_INTRO_SESSION_KEY = 'ramiz:matrix-intro:v2';
 
 export function shouldPlaySiteIntro() {
   if (typeof window === 'undefined') return false;

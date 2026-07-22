@@ -12,14 +12,17 @@ test.beforeEach(async ({ page }) => {
 test('assembles the interface once and keeps an immediate escape hatch', async ({ page }) => {
   await page.goto('./?intro=1');
   const intro = page.locator('[data-site-intro]');
+  const matrix = page.locator('[data-intro-matrix]');
   const hero = page.locator('.hero__sticky');
 
   await expect(intro).toBeVisible();
+  await expect(matrix).toHaveAttribute('data-matrix-state', 'running');
   await expect(page.locator('.scene canvas')).toHaveCount(0);
   const before = await hero.boundingBox();
 
   await page.getByRole('button', { name: 'Skip intro' }).click();
   await expect(intro).toHaveCount(0);
+  await expect(matrix).toHaveCount(0);
   await expect(page.getByRole('heading', { name: /technical complexity into business leverage/i })).toBeVisible();
   await expect(page.locator('.scene canvas')).toHaveCount(1);
   expect(await page.evaluate((key) => window.sessionStorage.getItem(key), SITE_INTRO_SESSION_KEY)).toBe('seen');
@@ -32,11 +35,27 @@ test('assembles the interface once and keeps an immediate escape hatch', async (
 
   await page.goto('./');
   await expect(intro).toHaveCount(0);
+  await expect(matrix).toHaveCount(0);
 
   await page.goto('./?intro=1');
   await expect(intro).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(intro).toHaveCount(0);
+});
+
+test('flies through on scroll intent and destroys the intro matrix before the hero', async ({ page }) => {
+  await page.goto('./?intro=1');
+  const intro = page.locator('[data-site-intro]');
+  const matrix = page.locator('[data-intro-matrix]');
+
+  await expect(matrix).toHaveAttribute('data-matrix-state', 'running');
+  await expect(page.locator('.scene canvas')).toHaveCount(0);
+  await page.mouse.wheel(0, 420);
+
+  await expect(intro).toHaveCount(0, { timeout: 3_000 });
+  await expect(matrix).toHaveCount(0);
+  await expect(page.locator('.scene canvas')).toHaveCount(1);
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
 });
 
 test('tells the full scroll story without overflow or runtime errors', async ({ page }) => {
