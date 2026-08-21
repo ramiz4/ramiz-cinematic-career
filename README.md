@@ -12,8 +12,8 @@ responsive scrollytelling experience.
 ## Development
 
 ```bash
-npm ci
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 The Vite development URL is `http://localhost:5173/` by default.
