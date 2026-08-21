@@ -302,7 +302,7 @@ test('prioritizes mobile story copy over dense system diagrams', async ({ page }
     await expect(page.locator('.operating-visual__header')).toHaveCSS('display', 'none');
     await expect(page.locator('.operating-visual__canvas')).toHaveCSS('display', 'none');
     await expect(page.locator('.operating-visual__rail')).toHaveCSS('display', 'none');
-    await expect(page.locator('.decision-console')).toBeVisible();
+    await expect(page.locator('.decision-filters')).toBeVisible();
     await expect(page.locator('[data-system-story] .pin-spacer')).toHaveCount(0);
     await expect(page.locator('[data-operating-story] .pin-spacer')).toHaveCount(0);
 
