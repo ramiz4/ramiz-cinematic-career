@@ -76,6 +76,7 @@
   display: grid;
   grid-template-columns: minmax(19rem, .72fr) minmax(36rem, 1.28fr);
   gap: clamp(2.5rem, 5vw, 6rem);
+  max-width: 110rem;
   padding: 0 var(--page-x) 8rem;
 }
 
@@ -159,7 +160,7 @@
   grid-column: 2;
   grid-row: 1;
   align-self: start;
-  height: calc(100svh - 5.5rem);
+  height: min(calc(100svh - 5.5rem), 58rem);
   min-height: 38rem;
   margin-top: 5.5rem;
   overflow: hidden;
