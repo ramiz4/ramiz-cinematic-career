@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 import { App } from './App';
 import { SITE_INTRO_SESSION_KEY } from '../components/siteIntroSession';
 
@@ -25,7 +24,7 @@ describe('App', () => {
   beforeEach(() => window.sessionStorage.setItem(SITE_INTRO_SESSION_KEY, 'seen'));
 
   it('renders the complete story in an accessible document order', () => {
-    render(<MemoryRouter><App /></MemoryRouter>);
+    render(<App />);
     expect(screen.getByRole('heading', { name: /turn technical complexity into business leverage/i })).toBeInTheDocument();
     for (const heading of [
       'Scale the system. Then scale change.',
@@ -49,7 +48,7 @@ describe('App', () => {
 
   it('isolates the page while the intro is active', async () => {
     window.sessionStorage.removeItem(SITE_INTRO_SESSION_KEY);
-    render(<MemoryRouter><App /></MemoryRouter>);
+    render(<App />);
 
     const intro = screen.getByRole('dialog', { name: /initializing the three-dimensional engineering matrix/i });
     const shell = document.querySelector('[data-site-shell]');
@@ -66,7 +65,7 @@ describe('App', () => {
   });
 
   it('traps focus inside the cinematic journey menu and restores it on close', async () => {
-    render(<MemoryRouter><App /></MemoryRouter>);
+    render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Open journey menu' }));
     const dialog = screen.getByRole('dialog', { name: 'Your journey' });
     const closeButton = within(dialog).getByRole('button', { name: 'Close journey menu' });
