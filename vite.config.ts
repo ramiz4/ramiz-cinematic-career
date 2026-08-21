@@ -3,22 +3,22 @@ import { defineConfig } from 'vitest/config';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  base: '/ramiz-cinematic-career/',
+  base: './',
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        id: '/ramiz-cinematic-career/',
+        id: '.',
         name: 'Ramiz Loki — Technology Leadership',
         short_name: 'Ramiz Loki',
         description: 'Architecture, delivery and technical leadership translated into business leverage.',
         theme_color: '#07130d',
         background_color: '#050806',
         display: 'standalone',
-        start_url: '/ramiz-cinematic-career/',
-        scope: '/ramiz-cinematic-career/',
+        start_url: '.',
+        scope: '.',
         lang: 'en',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
@@ -27,7 +27,7 @@ export default defineConfig({
         ]
       },
       workbox: {
-        navigateFallback: '/ramiz-cinematic-career/index.html',
+        navigateFallback: 'index.html',
         globPatterns: ['**/*.{js,css,html,svg,png,webp}']
       }
     })

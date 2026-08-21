@@ -1,6 +1,8 @@
 # Ramiz Technology Leadership
 
-Preview: https://ramiz4.github.io/ramiz-cinematic-career/
+Production URLs:
+https://ramizloki.com/
+https://ramiz4.github.io/ramiz-cinematic-career/
 
 A production-oriented technology-leadership portfolio built with React 19,
 TypeScript, GSAP/ScrollTrigger and React Three Fiber. Its core narrative turns
@@ -10,12 +12,11 @@ responsive scrollytelling experience.
 ## Development
 
 ```bash
-npm ci
-npm run dev
+pnpm install
+pnpm dev
 ```
 
-The Vite development URL is
-`http://localhost:5173/ramiz-cinematic-career/` by default.
+The Vite development URL is `http://localhost:5173/` by default.
 
 ## Architecture
 
