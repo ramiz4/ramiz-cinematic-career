@@ -302,7 +302,7 @@ test('prioritizes mobile story copy over dense system diagrams', async ({ page }
     await expect(page.locator('.operating-visual__header')).toHaveCSS('display', 'none');
     await expect(page.locator('.operating-visual__canvas')).toHaveCSS('display', 'none');
     await expect(page.locator('.operating-visual__rail')).toHaveCSS('display', 'none');
-    await expect(page.locator('.decision-console')).toBeVisible();
+    await expect(page.locator('.decision-filters')).toBeVisible();
     await expect(page.locator('[data-system-story] .pin-spacer')).toHaveCount(0);
     await expect(page.locator('[data-operating-story] .pin-spacer')).toHaveCount(0);
 
@@ -332,21 +332,21 @@ test('keeps mobile operating stages reversible and decision filters readable', a
   await page.goto('./');
 
   const story = page.locator('[data-operating-story]');
-  const decisionConsole = page.locator('.decision-console');
+  const decisionFilters = page.locator('.decision-filters');
   await expect(story).toHaveAttribute('data-motion', 'compact');
   await expect(story).toHaveAttribute('data-operating-stage', '1');
   await expect(page.locator('.operating-visual__canvas')).toHaveCSS('display', 'none');
-  await expect(decisionConsole).toBeVisible();
+  await expect(decisionFilters).toBeVisible();
 
   const documentGap = await page.evaluate(() => {
     const steps = document.querySelector('.operating-system__steps');
-    const filters = document.querySelector('.decision-console');
+    const filters = document.querySelector('.decision-filters');
     if (!steps || !filters) return -1;
     return filters.getBoundingClientRect().top - steps.getBoundingClientRect().bottom;
   });
   expect(documentGap).toBeGreaterThanOrEqual(32);
 
-  for (const title of await page.locator('.operating-visual__principles dt').all()) {
+  for (const title of await page.locator('.decision-filter__name').all()) {
     expect(parseFloat(await title.evaluate((element) => getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(12);
   }
   for (const meaning of await page.locator('.decision-filter__meaning').all()) {

@@ -10,6 +10,7 @@ import { SystemTransformation } from '../chapters/SystemTransformation';
 import { LeadershipJourney } from '../chapters/LeadershipJourney';
 import { Impact } from '../chapters/Impact';
 import { OperatingModel } from '../chapters/OperatingModel';
+import { DecisionFilters } from '../chapters/DecisionFilters';
 import { Contact } from '../chapters/Contact';
 
 export function App() {
@@ -40,9 +41,13 @@ export function App() {
           <LeadershipJourney />
           <Impact />
           <OperatingModel />
+          <DecisionFilters />
           <Contact />
         </main>
-        <footer>© {new Date().getFullYear()} Ramiz Loki · Engineered with intent.</footer>
+        <footer>
+          <span>© {new Date().getFullYear()} Ramiz Loki · Engineered with intent.</span>
+          <a className="footer__top" href="#hero" aria-label="Back to top"><i aria-hidden="true">↑</i> Top</a>
+        </footer>
       </div>
     </div>
   </>;

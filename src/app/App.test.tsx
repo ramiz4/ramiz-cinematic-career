@@ -38,7 +38,7 @@ describe('App', () => {
     expect(document.querySelectorAll('[data-journey-step]')).toHaveLength(5);
     expect(document.querySelectorAll('[data-impact-stage]')).toHaveLength(12);
     expect(document.querySelectorAll('[data-operating-step]')).toHaveLength(5);
-    expect(document.querySelectorAll('.operating-visual__principles > div')).toHaveLength(4);
+    expect(document.querySelectorAll('.decision-filter')).toHaveLength(4);
     expect(screen.getByText('GitHub Actions')).toBeInTheDocument();
     expect(screen.getByText(/Single Responsibility · Open\/Closed/)).toBeInTheDocument();
     expect(screen.getByText('Don’t Repeat Yourself')).toBeInTheDocument();

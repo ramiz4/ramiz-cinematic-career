@@ -26,7 +26,13 @@ function queryAll(scope, selector) {
 function prepareDrawPaths(paths) {
   paths.forEach((path) => {
     if (typeof path.getTotalLength !== 'function') return;
-    const length = Math.max(path.getTotalLength(), 1);
+    const geomLength = path.getTotalLength();
+    // non-scaling-stroke means dasharray is in screen-pixels, not SVG user-units.
+    const svgEl = path.ownerSVGElement;
+    const vbWidth = svgEl?.viewBox?.baseVal?.width;
+    const renderedWidth = svgEl ? svgEl.getBoundingClientRect().width : 0;
+    const scale = vbWidth && renderedWidth ? renderedWidth / vbWidth : 1;
+    const length = Math.max(geomLength * scale, 1);
     gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
   });
 }
@@ -173,6 +179,7 @@ export function initSystemGraphScrollytelling(root, { onStepChange = noop } = {}
           pinSpacing: false,
           anticipatePin: 1,
           invalidateOnRefresh: true,
+          onRefresh: () => prepareDrawPaths(drawablePaths),
           onUpdate: (trigger) => activateStep(trigger.progress),
         },
       });

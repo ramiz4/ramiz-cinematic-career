@@ -1,8 +1,6 @@
-import { decisionFilters } from '../content/operatingModel';
-
 export function EngineeringOperatingVisual() {
   return (
-    <aside className="operating-visual" data-operating-visual aria-label="Engineering operating system and decision filters">
+    <aside className="operating-visual" data-operating-visual aria-label="Engineering operating system">
       <header className="operating-visual__header">
         <span>engineering.os</span>
         <div><strong data-operating-index>01 / 05</strong><em data-operating-label>Evidence model</em></div>
@@ -115,23 +113,6 @@ export function EngineeringOperatingVisual() {
           </g>
         </svg>
       </div>
-
-      <section className="decision-console" aria-label="Engineering decision filters">
-        <header className="decision-console__header" aria-hidden="true">
-          <span>decision.filters</span>
-          <strong><i />04 GUARDRAILS ACTIVE</strong>
-        </header>
-        <dl className="operating-visual__principles">
-          {decisionFilters.map((filter, index) => (
-            <div key={filter.principle}>
-              <span>0{index + 1}</span>
-              <dt>{filter.principle}</dt>
-              <dd className="decision-filter__meaning">{filter.meaning}</dd>
-              <dd className="decision-filter__effect">{filter.effect}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
 
       <div className="operating-visual__rail" aria-hidden="true">
         <div><span>Analyze</span><span>Verify</span><span>Structure</span><span>Parallelize</span><span>Deliver</span></div>
